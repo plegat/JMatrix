@@ -405,7 +405,7 @@ public class SkylineSquareHalfMatrix implements Serializable {
         }        
     }
     
-    
+ 
     public Vector product(Vector vect) {
         
         Vector prod=new Vector();
