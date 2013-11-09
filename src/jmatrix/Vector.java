@@ -73,4 +73,75 @@ public class Vector {
         return this.values.get(rank);
     }
     
+    public void sort() {
+        
+        int nbElem=this.ranks.size();
+        
+        for (int i = 1; i < nbElem; i++) {
+            
+            int rank=this.ranks.get(i);
+            
+            int targetRank=i;
+            
+            while ((targetRank>0)&&(this.ranks.get(targetRank-1)>rank)) {
+                targetRank--;
+            }
+            
+            if (targetRank<i) {
+                
+                double value=this.values.get(i);
+                
+                this.ranks.remove(i);
+                this.values.remove(i);
+                
+                this.ranks.add(targetRank, rank);
+                this.values.add(targetRank, value);
+                
+            }
+            
+        }
+        
+        
+        
+    }
+    
+    @Override
+    public String toString() {
+        
+        StringBuilder sb=new StringBuilder();
+        
+        int nbElem=this.ranks.size();
+        
+        for (int i = 0; i < nbElem; i++) {
+            
+            sb.append(this.ranks.get(i)).append(": ").append(this.values.get(i)).append("\n");
+            
+        }
+        
+        return sb.toString();
+    }
+    
+    
+    public static void main(String[] args) {
+        
+        Vector vect=new Vector();
+        
+        vect.setVal(10, 10);
+        vect.setVal(5, 5);
+        vect.setVal(7, 7);
+        vect.setVal(2, 2);
+        vect.setVal(15, 15);
+        
+        System.out.println("vecteur non trié:");
+        System.out.println(vect.toString());
+        
+        vect.sort();
+        
+        System.out.println("vecteur trié:");
+        System.out.println(vect.toString());
+        
+        
+    }
+    
+    
 }

@@ -124,6 +124,36 @@ public class ProblemMatrix {
 
     public boolean solve(Vector displacements, Vector loads) {
 
+        displacements.sort();
+        loads.sort();
+        
+        if (this.state==RAW) {
+            this.LUDecomposition();
+        }
+        
+        double[][] result=new double[2][this.n];
+        
+        double[] interm=new double[n];
+        
+        // resolution matLow.interm=loads
+        
+        for (int i = 1; i <= this.n; i++) {
+            
+            double calc=loads.getVal(i);
+            
+            for (int j = 1; j < i; j++) {
+                
+                double factor=this.matLow.getVal(i, j);
+                
+                calc=calc-factor*interm[j-1];
+                
+            }
+            
+            interm[i-1]=calc;
+            
+        }
+        
+        // resolution matUp.disp=interm
         
         
         
@@ -137,50 +167,7 @@ public class ProblemMatrix {
 
         SkylineSquareHalfMatrix matUp = new SkylineSquareHalfMatrix(5, SkylineSquareHalfMatrix.UPPER);
 
-        for (int i = 1; i <= 5; i++) {
-            for (int j = i; j <= 5; j++) {
-                matUp.setVal(i, j, i * 10 + j);
-            }
-        }
-
-        matUp.trimToSize();
-        System.out.println(matUp.valToString());
-
-        System.out.println("matrix upper:");
-        System.out.println(matUp.toString());
-
-        SquareMatrix matSymSq = matUp.convertToSymSquare();
-        System.out.println("matrix upper convertTo squareSym:");
-        System.out.println(matSymSq.toString());
-
-        SquareMatrix matLUlow = matSymSq.LUDecomposition();
-        System.out.println("LU decomposition");
-        System.out.println("U matrix:");
-        System.out.println(matSymSq.toString());
-        System.out.println("L matrix:");
-        System.out.println(matLUlow.toString());
-
-        SquareMatrix product = matLUlow.matMult(matSymSq);
-        System.out.println("check product:");
-        System.out.println(product.toString());
-
-        ProblemMatrix pm = new ProblemMatrix(5);
-        for (int i = 1; i <= 5; i++) {
-            for (int j = i; j <= 5; j++) {
-                pm.setVal(i, j, i * 10 + j);
-            }
-        }
-        System.out.println("problem matrix");
-        System.out.println(pm.toString());
-
-        pm.LUDecomposition();
-
-        System.out.println("problem matrix, after LU decomposition");
-        System.out.println(pm.toString());
-
-        System.out.println("check product");
-        product = pm.matLow.convertToSquare().matMult(pm.matUp.convertToSquare());
-        System.out.println(product.toString());
+        
 
     }
 
