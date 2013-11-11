@@ -121,6 +121,18 @@ public class Vector {
         return sb.toString();
     }
     
+    public int getIndexOf(int rank) {
+
+        for (Integer current : ranks) {
+            if (current==rank) {
+                return this.ranks.indexOf(current);
+            }
+        }
+        
+        return -1;
+    }
+    
+    
     
     public static void main(String[] args) {
         
@@ -131,14 +143,13 @@ public class Vector {
         vect.setVal(7, 7);
         vect.setVal(2, 2);
         vect.setVal(15, 15);
-        
-        System.out.println("vecteur non trié:");
+
+        System.out.println("vecteur:");
         System.out.println(vect.toString());
         
-        vect.sort();
-        
-        System.out.println("vecteur trié:");
-        System.out.println(vect.toString());
+        for (int i = 1; i < 20; i++) {
+            System.out.println("rang "+i+": "+vect.getIndexOf(i));
+        }
         
         
     }

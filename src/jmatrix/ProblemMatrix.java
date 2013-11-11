@@ -122,53 +122,154 @@ public class ProblemMatrix {
 
     }
 
-    public boolean solve(Vector displacements, Vector loads) {
+    public double[][] solve(Vector displacements, Vector loads) {
 
         displacements.sort();
         loads.sort();
-        
-        if (this.state==RAW) {
+
+        if (this.state == RAW) {
             this.LUDecomposition();
         }
-        
-        double[][] result=new double[2][this.n];
-        
-        double[] interm=new double[n];
-        
+
+        double[][] result = new double[2][this.n];
+
+        double[] interm = new double[n];
+
         // resolution matLow.interm=loads
-        
         for (int i = 1; i <= this.n; i++) {
-            
-            double calc=loads.getVal(i);
-            
-            for (int j = 1; j < i; j++) {
-                
-                double factor=this.matLow.getVal(i, j);
-                
-                calc=calc-factor*interm[j-1];
-                
+
+            double calc = loads.getVal(i);
+
+            int startColumn = matLow.getStartColumn(i);
+
+            for (int j = startColumn; j < i; j++) {
+
+                double factor = this.matLow.getVal(i, j);
+
+                calc = calc - factor * interm[j - 1];
+
             }
-            
-            interm[i-1]=calc;
-            
+
+            interm[i - 1] = calc;
+
+        }
+
+        // resolution matUp.disp=interm
+        // passage déplacements imposes à droite 
+        int nbDispImposed = displacements.getValNumber();
+
+        for (int row = 1; row <= this.n; row++) {
+
+            for (int i = 0; i < nbDispImposed; i++) {
+
+                int rowDisp = displacements.getRankValue(i);
+
+                if (rowDisp >= row) {
+
+                    double dispImposed = displacements.getVal(i);
+
+                    interm[row - 1] = interm[row - 1] - dispImposed * matUp.getVal(row, rowDisp);
+                }
+            }
+        }
+
+        // resolution
+        for (int row = this.n; row > 0; row--) {
+
+            int dispImposedIndex = displacements.getIndexOf(row);
+
+            if (dispImposedIndex > -1) {
+                result[0][row - 1] = 0.;
+            } else {
+
+                double calc = interm[row - 1];
+
+                for (int i = row + 1; i <= this.n; i++) {
+                    calc = calc - this.matUp.getVal(row, i) * result[0][i - 1];
+                }
+
+                result[0][row - 1] = calc / this.matUp.getVal(row, row);
+            }
         }
         
-        // resolution matUp.disp=interm
+        
+        // deplacements imposes    
+        for (int i = 0; i < nbDispImposed; i++) {
+
+            int rowDisp = displacements.getRankValue(i);
+            double dispImposed = displacements.getVal(i);
+
+            result[0][rowDisp - 1] = dispImposed;
+
+        }
+
+        
+        // calcul des forces
         
         
+        //calcul Ux
+        for (int row = 1; row <= this.n; row++) {
+
+            double calc=0;
+            
+            for (int i = row; i <= Math.min(this.n,this.matUp.getEndColumn(row)); i++) {
+                calc=calc+this.matUp.getVal(row, i)*result[0][i-1];
+            }
+            
+            interm[row-1]=calc;
+        }
+
+        //calcul LUx
         
+        for (int row = 1; row <= this.n; row++) {
+
+            double calc=0;
+            
+            for (int i = Math.max(1,this.matLow.getStartColumn(row)); i <= row; i++) {
+                calc=calc+this.matLow.getVal(row, i)*result[0][i-1];
+            }
+            
+            result[1][row-1]=calc;
+        }
         
-        
-        return true;
-        
+        return result;
     }
 
     public static void main(String[] args) {
 
-        SkylineSquareHalfMatrix matUp = new SkylineSquareHalfMatrix(5, SkylineSquareHalfMatrix.UPPER);
-
+        int n=10;
+        int nbVal=100;
         
+        SkylineSquareHalfMatrix matUp = new SkylineSquareHalfMatrix(n, SkylineSquareHalfMatrix.UPPER);
+        matUp.setRandom(nbVal, 0.1, 10);
+        
+        System.out.println("matUp");
+        System.out.println(matUp.toString());
 
+        SquareMatrix matSq=matUp.convertToSymSquare();
+        
+        System.out.println("matSq:");
+        System.out.println(matSq.toString());
+        
+        ProblemMatrix pbMat=new ProblemMatrix(n);
+        
+        for (int i = 1; i <= n; i++) {
+            for (int j = 1; j <= n; j++) {
+                
+                pbMat.setVal(i, j, matSq.getVal(i, j));
+                
+            }
+        }
+        
+        System.out.println("pbMat:");
+        System.out.println(pbMat.toString());
+        
+        pbMat.LUDecomposition();
+        
+        System.out.println("pbMat:");
+        System.out.println(pbMat.toString());
+        
+        
     }
 
 }

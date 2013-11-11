@@ -213,7 +213,14 @@ public class SkylineSquareHalfMatrix implements Serializable {
 
         double factor = max - min;
 
-        for (int i = 0; i < nbValues; i++) {
+        for (int i = 1; i <= this.n; i++) {
+            
+            double value = Math.random() * factor + min;
+            
+            this.setVal(i, i, value);
+        }
+        
+        for (int i = 0; i < nbValues-this.n; i++) {
 
             int row = Math.min((int) Math.round(Math.random() * n) + 1, n);
             int col = Math.min((int) Math.round(Math.random() * n) + 1, n);
@@ -222,6 +229,10 @@ public class SkylineSquareHalfMatrix implements Serializable {
 
             this.setVal(row, col, value);
         }
+        
+        
+        
+        
     }
 
     @Override
