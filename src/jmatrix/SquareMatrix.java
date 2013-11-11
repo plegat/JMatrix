@@ -158,7 +158,7 @@ public class SquareMatrix implements Serializable {
     @Override
     public String toString() {
 
-        DecimalFormat df=new DecimalFormat(" 0.00;-0.00");
+        DecimalFormat df=new DecimalFormat(" 0.0000;-0.0000");
         
         
         StringBuilder buf = new StringBuilder();

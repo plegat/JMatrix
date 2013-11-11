@@ -238,7 +238,7 @@ public class SkylineSquareHalfMatrix implements Serializable {
     @Override
     public String toString() {
 
-        DecimalFormat df=new DecimalFormat(" 0.00;-0.00");
+        DecimalFormat df=new DecimalFormat(" 0.0000000;-0.0000000");
         
         StringBuilder buf = new StringBuilder();
 
