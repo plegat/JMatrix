@@ -246,11 +246,11 @@ public class ProblemMatrix {
 
     public static void main(String[] args) {
 
-        int n = 10;
-        int nbVal = 100;
+        int n = 4;
+        int nbVal = 50;
 
         SkylineSquareHalfMatrix matUp = new SkylineSquareHalfMatrix(n, SkylineSquareHalfMatrix.UPPER);
-        matUp.setRandom(nbVal, 0.1, 10);
+        matUp.setRandomInt(nbVal, 0.1, 10);
 
         System.out.println("matUp");
         System.out.println(matUp.toString());
@@ -281,11 +281,11 @@ public class ProblemMatrix {
         Vector force = new Vector();
         force.setVal(2, 100);
         force.setVal(4, 100);
-        force.setVal(6, 100);
+        //force.setVal(6, 100);
 
         Vector disp = new Vector();
         disp.setVal(1, 1);
-        disp.setVal(7, 1);
+        //disp.setVal(7, 1);
 
         System.out.println("force:");
         System.out.println(force.toString());

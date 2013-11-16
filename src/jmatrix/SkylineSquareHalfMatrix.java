@@ -16,7 +16,7 @@ import java.util.ArrayList;
  */
 public class SkylineSquareHalfMatrix implements Serializable {
 
-    private final int n;
+    private int n;
     private ArrayList<Double> val;
     private ArrayList<Integer> ptr;
     private static final double EPSILON = 1e-6;
@@ -72,7 +72,7 @@ public class SkylineSquareHalfMatrix implements Serializable {
 
         // check value==0
         if (Math.abs(value) < SkylineSquareHalfMatrix.EPSILON) {
-            value=0.;
+            value = 0.;
         }
 
         // check out of bounds
@@ -214,13 +214,13 @@ public class SkylineSquareHalfMatrix implements Serializable {
         double factor = max - min;
 
         for (int i = 1; i <= this.n; i++) {
-            
+
             double value = Math.random() * factor + min;
-            
+
             this.setVal(i, i, value);
         }
-        
-        for (int i = 0; i < nbValues-this.n; i++) {
+
+        for (int i = 0; i < nbValues - this.n; i++) {
 
             int row = Math.min((int) Math.round(Math.random() * n) + 1, n);
             int col = Math.min((int) Math.round(Math.random() * n) + 1, n);
@@ -229,17 +229,37 @@ public class SkylineSquareHalfMatrix implements Serializable {
 
             this.setVal(row, col, value);
         }
-        
-        
-        
-        
+
+    }
+
+    public void setRandomInt(int nbValues, double min, double max) {
+
+        double factor = max - min;
+
+        for (int i = 1; i <= this.n; i++) {
+
+            double value = Math.round(Math.random() * factor + min);
+
+            this.setVal(i, i, value);
+        }
+
+        for (int i = 0; i < nbValues - this.n; i++) {
+
+            int row = Math.min((int) Math.round(Math.random() * n) + 1, n);
+            int col = Math.min((int) Math.round(Math.random() * n) + 1, n);
+
+            double value = Math.round(Math.random() * factor + min);
+
+            this.setVal(row, col, value);
+        }
+
     }
 
     @Override
     public String toString() {
 
-        DecimalFormat df=new DecimalFormat(" 0.0000000;-0.0000000");
-        
+        DecimalFormat df = new DecimalFormat(" 0.0000000;-0.0000000");
+
         StringBuilder buf = new StringBuilder();
 
         for (int i = 0; i < this.n; i++) {
@@ -310,8 +330,8 @@ public class SkylineSquareHalfMatrix implements Serializable {
                         value = this.getVal(i, i + j);
                         matCopy.setVal(i, i + j, value);
                     } else {
-                        value = this.getVal(i, j+1);
-                        matCopy.setVal(i, j+1, value);
+                        value = this.getVal(i, j + 1);
+                        matCopy.setVal(i, j + 1, value);
                     }
                 } else if (this.type == UPPER) {
                     value = this.getVal(i, i + j);
@@ -329,10 +349,9 @@ public class SkylineSquareHalfMatrix implements Serializable {
     }
 
     public SquareMatrix convertToSymSquare() {
-        
-        SquareMatrix matConvert=new SquareMatrix(n);
 
-        
+        SquareMatrix matConvert = new SquareMatrix(n);
+
         double value;
 
         for (int i = 1; i <= n; i++) {
@@ -345,11 +364,11 @@ public class SkylineSquareHalfMatrix implements Serializable {
                 if (this.type == UPPER) {
                     value = this.getVal(i, i + j);
                     matConvert.setVal(i, i + j, value);
-                    matConvert.setVal(i + j,i,  value);
+                    matConvert.setVal(i + j, i, value);
                 } else {
                     value = this.getVal(i, j + 1);
                     matConvert.setVal(i, j + 1, value);
-                    matConvert.setVal(j + 1,i, value);
+                    matConvert.setVal(j + 1, i, value);
                 }
 
             }
@@ -357,15 +376,13 @@ public class SkylineSquareHalfMatrix implements Serializable {
         }
 
         return matConvert;
-        
-        
+
     }
-    
+
     public SquareMatrix convertToSquare() {
-        
-        SquareMatrix matConvert=new SquareMatrix(n);
 
-        
+        SquareMatrix matConvert = new SquareMatrix(n);
+
         double value;
 
         for (int i = 1; i <= n; i++) {
@@ -388,77 +405,112 @@ public class SkylineSquareHalfMatrix implements Serializable {
         }
 
         return matConvert;
-        
-        
+
     }
-    
+
     public int getStartColumn(int row) {
-        
-        if (this.type==UPPER) {
+
+        if (this.type == UPPER) {
             return row;
         } else {
-            int rank=this.ptr.get(row-1);
-            int rankNext=this.ptr.get(row);
-            
-            return row-(rankNext-rank)+1;
-        }        
-    }
-    
-    public int getEndColumn(int row) {
-        
-        if (this.type==LOWER) {
-            return row;
-        } else {
-            int rank=this.ptr.get(row-1);
-            int rankNext=this.ptr.get(row);
-            
-            return row+(rankNext-rank)-1;
-        }        
-    }
-    
- 
-    public Vector product(Vector vect) {
-        
-        Vector prod=new Vector();
-        int nbElm=vect.getValNumber();
-        
-        for (int i = 0; i < nbElm; i++) {
-            
-            int rank=vect.getRankValue(i);
-            double value=vect.getValueAtRank(i);
-            
-            for (int j = 0; j < n; j++) {
-                
-                
-                
-                
-            }
-            
-            
+            int rank = this.ptr.get(row - 1);
+            int rankNext = this.ptr.get(row);
+
+            return row - (rankNext - rank) + 1;
         }
-        
-        
-        
-        
-        return prod;
     }
-    
-    
-    
-    
+
+    public int getEndColumn(int row) {
+
+        if (this.type == LOWER) {
+            return row;
+        } else {
+            int rank = this.ptr.get(row - 1);
+            int rankNext = this.ptr.get(row);
+
+            return row + (rankNext - rank) - 1;
+        }
+    }
+
+    public boolean removeRowAndColumn(int row) {
+
+        if ((row < 1) || (row > this.n)) {
+            return false;
+        }
+
+        int ptrStart, ptrEnd;
+
+        if (this.type == UPPER) {
+
+            for (int i = 1; i < row; i++) { // suppression colonne
+
+                int colMax = this.getEndColumn(i);
+
+                if (colMax >= row) {
+                    ptrStart = this.ptr.get(i - 1);
+                    this.val.remove(ptrStart + (colMax - row));
+
+                    for (int j = i; j <= n; j++) {
+                        this.ptr.set(j, this.ptr.get(j) - 1);
+                    }
+                }
+            }
+        } else {
+
+            for (int i = row + 1; i <= this.n; i++) { // suppression colonne
+
+                int colMin = this.getStartColumn(i);
+
+                if (colMin <= row) {
+                    ptrStart = this.ptr.get(i - 1);
+                    this.val.remove(ptrStart + (row - colMin));
+
+                    for (int j = i; j <= n; j++) {
+                        this.ptr.set(j, this.ptr.get(j) - 1);
+                    }
+                }
+            }
+        }
+
+        // suppression ligne
+        ptrStart = this.ptr.get(row - 1);
+        ptrEnd = this.ptr.get(row);
+
+        for (int i = ptrEnd - 1; i >= ptrStart; i--) {
+            this.val.remove(i);
+        }
+
+        int delta = ptrEnd - ptrStart;
+
+        for (int i = row; i <= this.n; i++) {
+            this.ptr.set(i, this.ptr.get(i) - delta);
+        }
+
+        this.ptr.remove(row - 1);
+
+        this.n--;
+
+        return true;
+
+    }
+
     public static void main(String[] args) {
 
-        int taille=10;
-        
+        int taille = 6;
+
         SkylineSquareHalfMatrix matLow = new SkylineSquareHalfMatrix(taille, UPPER);
-        matLow.setRandom((int)(taille*taille*0.5), -1., 1.);
-        
+        matLow.setRandom((int) (taille * taille * 5), -1., 1.);
+
         System.out.println(matLow.toString());
-        
-        for (int i = 0; i < taille; i++) {
-            System.out.println("ligne "+(i+1)+": "+matLow.getStartColumn(i+1)+" - "+matLow.getEndColumn(i+1));
-        }
-        
+        System.out.println("val: " + matLow.valToString());
+        System.out.println("ptr: " + matLow.ptrToString());
+
+        matLow.removeRowAndColumn(3);
+
+        System.out.println(matLow.toString());
+        System.out.println("val: " + matLow.valToString());
+        System.out.println("ptr: " + matLow.ptrToString());
+
     }
 
 }
