@@ -36,7 +36,7 @@ public class Vector {
         int rank = this.ranks.indexOf(numRow);
 
         if (rank < 0) {
-            return 0.;
+            return Double.NaN;
         } else {
             return this.values.get(rank);
         }
@@ -57,6 +57,22 @@ public class Vector {
             
         } else {
             this.values.set(rank,value);
+        }
+    
+    }
+
+    public void addVal(int numRow, double value) {
+    
+        int rank = this.ranks.indexOf(numRow);
+
+        if (rank < 0) {
+            this.ranks.add(numRow);
+            rank = this.ranks.indexOf(numRow);
+            
+            this.values.add(rank,value);
+            
+        } else {
+            this.values.set(rank,this.values.get(rank)+value);
         }
     
     }
@@ -133,6 +149,24 @@ public class Vector {
     }
     
     
+    public void deleteRow(int numRow) {
+        
+        int rank = this.ranks.indexOf(numRow);
+
+        if (rank >-1) {
+            this.ranks.remove(rank);
+            this.values.remove(rank);
+        } 
+        
+        for (int i = 0; i < this.ranks.size(); i++) {
+            
+            int currentRank=this.ranks.get(i);
+            
+            if (currentRank>numRow) {
+                this.ranks.set(i, currentRank-1);
+            }
+        }
+    }
     
     public static void main(String[] args) {
         
@@ -147,9 +181,11 @@ public class Vector {
         System.out.println("vecteur:");
         System.out.println(vect.toString());
         
-        for (int i = 1; i < 20; i++) {
-            System.out.println("rang "+i+": "+vect.getIndexOf(i));
-        }
+        vect.deleteRow(5);
+        System.out.println("vecteur:");
+        System.out.println(vect.toString());
+        
+        
         
         
     }

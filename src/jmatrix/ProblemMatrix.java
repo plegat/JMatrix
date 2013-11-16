@@ -55,7 +55,7 @@ public class ProblemMatrix {
 
         this.matLow = this.matUp.copyTo(SkylineSquareHalfMatrix.LOWER);
 
-        for (int i = 1; i <= n; i++) {
+        for (int i = 1; i <= this.matUp.getSize(); i++) {
 
             double pivot = this.matUp.getVal(i, i);
 
@@ -66,7 +66,7 @@ public class ProblemMatrix {
             }
 
             // modif matrice courante
-            for (int j = i + 1; j <= n; j++) {
+            for (int j = i + 1; j <= this.matUp.getSize(); j++) {
 
                 double factor = this.matLow.getVal(j, i);
 
@@ -74,7 +74,7 @@ public class ProblemMatrix {
                     for (int k = i + 1; k < j; k++) { // partie sous la diagonale => matLow
                         this.matLow.setVal(j, k, this.matLow.getVal(j, k) - this.matUp.getVal(i, k) / pivot * factor);
                     }
-                    for (int k = j; k <= n; k++) { // partie sur la diagonale => matUp
+                    for (int k = j; k <= this.matUp.getSize(); k++) { // partie sur la diagonale => matUp
                         this.matUp.setVal(j, k, this.matUp.getVal(j, k) - this.matUp.getVal(i, k) / pivot * factor);
                     }
                 }
@@ -83,7 +83,7 @@ public class ProblemMatrix {
 
             // remplissage matrice low
             matLow.setVal(i, i, 1);
-            for (int j = i + 1; j <= n; j++) {
+            for (int j = i + 1; j <= this.matUp.getSize(); j++) {
                 if (Math.abs(this.matLow.getVal(j, i)) < EPSILON) {
                     matLow.setVal(j, i, 0.);
                 } else {
@@ -127,18 +127,93 @@ public class ProblemMatrix {
         displacements.sort();
         loads.sort();
 
+        System.out.println("disp");
+        System.out.println(displacements.toString());
+        System.out.println("loads");
+        System.out.println(loads.toString());
+
+        // initialisation des resultats efforts
+        double[][] result = new double[2][this.n];
+
+        for (int i = 0; i < this.n; i++) {
+            result[1][i] = 0;
+        }
+
+        int nbLoads = loads.getValNumber();
+
+        for (int i = 0; i < nbLoads; i++) {
+            int row = loads.getRankValue(i);
+            double value = loads.getValueAtRank(i);
+
+            result[1][row - 1] = value;
+        }
+
+        // clonage matrice sur lignes deplacements imposes
+        SkylineSquareHalfMatrix matDisp = new SkylineSquareHalfMatrix(this.n, SkylineSquareHalfMatrix.UPPER);
+
+        int nbDisp = displacements.getValNumber();
+
+        for (int i = 0; i < nbDisp; i++) {
+
+            int rank = displacements.getRankValue(i);
+            int colMax = this.matUp.getEndColumn(rank);
+
+            for (int j = rank; j <= colMax; j++) {
+                matDisp.setVal(rank, j, this.matUp.getVal(rank, j));
+            }
+
+        }
+
+        // modification du vecteur effort
+        for (int row = 1; row <= this.n; row++) {
+
+            for (int i = 0; i < nbDisp; i++) {
+
+                int rank = displacements.getRankValue(i);
+                double value = displacements.getValueAtRank(i);
+
+                int colMax = this.matUp.getEndColumn(rank);
+                double factor;
+
+                if (rank > colMax) {
+                    factor = 0;
+                } else if (rank > row) {
+                    factor = this.matUp.getVal(row, rank);
+                } else {
+                    factor = this.matUp.getVal(rank, row);
+                }
+
+                loads.addVal(row, -factor * value);
+            }
+        }
+
+        // suppression des lignes
+        for (int i = nbDisp; i > 0; i--) {
+            int rank = displacements.getRankValue(i - 1);
+            loads.deleteRow(rank);
+
+            this.matUp.removeRowAndColumn(rank);
+
+        }
+
+        System.out.println("matrice à resoudre:");
+        System.out.println(this.matUp.toString());
+
+        System.out.println("vecteur effort");
+        loads.sort();
+        System.out.println(loads.toString());
+
+        // decomposition LU
         if (this.state == RAW) {
             this.LUDecomposition();
         }
-
-        double[][] result = new double[2][this.n];
 
         double[] interm = new double[n];
 
         System.out.println("resolution Lx=F");
 
         // resolution matLow.interm=loads
-        for (int i = 1; i <= this.n; i++) {
+        for (int i = 1; i <= this.matUp.getSize(); i++) {
             double calc = loads.getVal(i);
 
             int startColumn = matLow.getStartColumn(i);
@@ -155,49 +230,20 @@ public class ProblemMatrix {
         }
 
         System.out.println("solution intermediaire:");
-        for (int i = 0; i < this.n; i++) {
+        for (int i = 0; i < this.matUp.getSize(); i++) {
             System.out.println(interm[i]);
         }
         System.out.println("");
 
         // resolution matUp.disp=interm
-        // passage déplacements imposes à droite 
-        int nbDispImposed = displacements.getValNumber();
-
-        for (int row = 1; row <= this.n; row++) {
-
-            for (int i = 0; i < nbDispImposed; i++) {
-
-                int rowDisp = displacements.getRankValue(i);
-
-                if (rowDisp >= row) {
-
-                    double dispImposed = displacements.getValueAtRank(i);
-
-                    interm[row - 1] = interm[row - 1] - dispImposed * matUp.getVal(row, rowDisp);
-                }
-            }
-        }
-
-        System.out.println("solution intermediaire apres passage disp à droite:");
-        for (int i = 0; i < this.n; i++) {
-            System.out.println(interm[i]);
-        }
-        System.out.println("");
-
-        
         // resolution
-        for (int row = this.n; row > 0; row--) {
+        for (int row = this.matUp.getSize(); row > 0; row--) {
 
-            int dispImposedIndex = displacements.getIndexOf(row);
-
-            if (dispImposedIndex > -1) {
-                result[0][row - 1] = 0.;
-            } else {
+            {
 
                 double calc = interm[row - 1];
 
-                for (int i = row + 1; i <= this.n; i++) {
+                for (int i = row + 1; i <= this.matUp.getSize(); i++) {
                     calc = calc - this.matUp.getVal(row, i) * result[0][i - 1];
                 }
 
@@ -205,40 +251,48 @@ public class ProblemMatrix {
             }
         }
 
-        // deplacements imposes    
-        for (int i = 0; i < nbDispImposed; i++) {
+        System.out.println("deplacements solution");
+        for (int i = 0; i < this.matUp.getSize(); i++) {
+            System.out.println(result[0][i]);
+        }
+
+        // insertion des deplacements imposes    
+        for (int i = 0; i < nbDisp; i++) {
 
             int rowDisp = displacements.getRankValue(i);
             double dispImposed = displacements.getValueAtRank(i);
 
-            System.out.println("init disp imposed row "+rowDisp+" at "+dispImposed);
+            System.out.println("init disp imposed row " + rowDisp + " at " + dispImposed);
+            for (int j = n - 1; j >= rowDisp; j--) {
+                result[0][j] = result[0][j - 1];
+            }
             result[0][rowDisp - 1] = dispImposed;
-
         }
 
         // calcul des forces
-        //calcul Ux
-        for (int row = 1; row <= this.n; row++) {
-
-            double calc = 0;
-
-            for (int i = row; i <= Math.min(this.n, this.matUp.getEndColumn(row)); i++) {
-                calc = calc + this.matUp.getVal(row, i) * result[0][i - 1];
-            }
-
-            interm[row - 1] = calc;
+        // mise a jour uniquement avec deplacements imposes
+        System.out.println("effort avant calcul");
+        for (int i = 0; i < this.n; i++) {
+            System.out.println(result[1][i]);
         }
 
-        //calcul LUx
-        for (int row = 1; row <= this.n; row++) {
+        for (int i = 0; i < nbDisp; i++) {
 
-            double calc = 0;
+            int rank = displacements.getRankValue(i);
+            double value = result[0][rank-1];
 
-            for (int i = Math.max(1, this.matLow.getStartColumn(row)); i <= row; i++) {
-                calc = calc + this.matLow.getVal(row, i) * interm[i - 1];
+            int colMax = matDisp.getEndColumn(rank);
+            double factor=0;
+
+            for (int j = 1; j <= rank; j++) {
+                factor=factor+value*matDisp.getVal(j, rank);
             }
+            for (int j = rank+1; j <= Math.min(rank,colMax); j++) {
+                factor=factor+value*matDisp.getVal(rank,j);
+            }
+            
 
-            result[1][row - 1] = calc;
+            result[1][rank - 1] = factor;
         }
 
         return result;
@@ -249,31 +303,20 @@ public class ProblemMatrix {
         int n = 4;
         int nbVal = 50;
 
-        SkylineSquareHalfMatrix matUp = new SkylineSquareHalfMatrix(n, SkylineSquareHalfMatrix.UPPER);
-        matUp.setRandomInt(nbVal, 0.1, 10);
-
-        System.out.println("matUp");
-        System.out.println(matUp.toString());
-
-        SquareMatrix matSq = matUp.convertToSymSquare();
-
-        System.out.println("matSq:");
-        System.out.println(matSq.toString());
-
         ProblemMatrix pbMat = new ProblemMatrix(n);
+        pbMat.setVal(1, 1, 4);
+        pbMat.setVal(1, 2, 1);
+        pbMat.setVal(1, 3, 8);
+        pbMat.setVal(1, 4, 2);
 
-        for (int i = 1; i <= n; i++) {
-            for (int j = 1; j <= n; j++) {
+        pbMat.setVal(2, 2, 9);
+        pbMat.setVal(2, 3, 2);
+        pbMat.setVal(2, 4, 0);
 
-                pbMat.setVal(i, j, matSq.getVal(i, j));
+        pbMat.setVal(3, 3, 6);
+        pbMat.setVal(3, 4, 1);
 
-            }
-        }
-
-        System.out.println("pbMat:");
-        System.out.println(pbMat.toString());
-
-        pbMat.LUDecomposition();
+        pbMat.setVal(4, 4, 6);
 
         System.out.println("pbMat:");
         System.out.println(pbMat.toString());
