@@ -127,11 +127,6 @@ public class ProblemMatrix {
         displacements.sort();
         loads.sort();
 
-        System.out.println("disp");
-        System.out.println(displacements.toString());
-        System.out.println("loads");
-        System.out.println(loads.toString());
-
         // initialisation des resultats efforts
         double[][] result = new double[2][this.n];
 
@@ -158,6 +153,17 @@ public class ProblemMatrix {
             int rank = displacements.getRankValue(i);
             int colMax = this.matUp.getEndColumn(rank);
 
+            boolean flag = false;
+            for (int j = 1; j <= rank; j++) {
+                double value = this.matUp.getVal(j, rank);
+                if ((!flag) && (Math.abs(value) > EPSILON)) {
+                    flag = true;
+                }
+                if (flag) {
+                    matDisp.setVal(j, rank, value);
+                }
+
+            }
             for (int j = rank; j <= colMax; j++) {
                 matDisp.setVal(rank, j, this.matUp.getVal(rank, j));
             }
@@ -191,26 +197,17 @@ public class ProblemMatrix {
         for (int i = nbDisp; i > 0; i--) {
             int rank = displacements.getRankValue(i - 1);
             loads.deleteRow(rank);
-
             this.matUp.removeRowAndColumn(rank);
-
         }
 
-        System.out.println("matrice à resoudre:");
-        System.out.println(this.matUp.toString());
-
-        System.out.println("vecteur effort");
         loads.sort();
-        System.out.println(loads.toString());
-
+        
         // decomposition LU
         if (this.state == RAW) {
             this.LUDecomposition();
         }
 
         double[] interm = new double[n];
-
-        System.out.println("resolution Lx=F");
 
         // resolution matLow.interm=loads
         for (int i = 1; i <= this.matUp.getSize(); i++) {
@@ -219,28 +216,17 @@ public class ProblemMatrix {
             int startColumn = matLow.getStartColumn(i);
 
             for (int j = startColumn; j < i; j++) {
-
                 double factor = this.matLow.getVal(i, j);
-
                 calc = calc - factor * interm[j - 1];
-
             }
-
             interm[i - 1] = calc;
         }
-
-        System.out.println("solution intermediaire:");
-        for (int i = 0; i < this.matUp.getSize(); i++) {
-            System.out.println(interm[i]);
-        }
-        System.out.println("");
-
+        
         // resolution matUp.disp=interm
         // resolution
         for (int row = this.matUp.getSize(); row > 0; row--) {
 
             {
-
                 double calc = interm[row - 1];
 
                 for (int i = row + 1; i <= this.matUp.getSize(); i++) {
@@ -250,19 +236,13 @@ public class ProblemMatrix {
                 result[0][row - 1] = calc / this.matUp.getVal(row, row);
             }
         }
-
-        System.out.println("deplacements solution");
-        for (int i = 0; i < this.matUp.getSize(); i++) {
-            System.out.println(result[0][i]);
-        }
-
+        
         // insertion des deplacements imposes    
         for (int i = 0; i < nbDisp; i++) {
 
             int rowDisp = displacements.getRankValue(i);
             double dispImposed = displacements.getValueAtRank(i);
 
-            System.out.println("init disp imposed row " + rowDisp + " at " + dispImposed);
             for (int j = n - 1; j >= rowDisp; j--) {
                 result[0][j] = result[0][j - 1];
             }
@@ -271,27 +251,27 @@ public class ProblemMatrix {
 
         // calcul des forces
         // mise a jour uniquement avec deplacements imposes
-        System.out.println("effort avant calcul");
-        for (int i = 0; i < this.n; i++) {
-            System.out.println(result[1][i]);
+        //mise à zero des efforts sur deplacement impose
+        for (int i = 0; i < nbDisp; i++) {
+            int rowDisp = displacements.getRankValue(i);
+            result[1][rowDisp - 1] = 0.;
         }
 
+        // calcul des efforts sur deplacement impose
+        
         for (int i = 0; i < nbDisp; i++) {
 
             int rank = displacements.getRankValue(i);
-            double value = result[0][rank-1];
 
             int colMax = matDisp.getEndColumn(rank);
-            double factor=0;
+            double factor = 0;
 
             for (int j = 1; j <= rank; j++) {
-                factor=factor+value*matDisp.getVal(j, rank);
+                factor = factor + result[0][j - 1] * matDisp.getVal(j, rank);
             }
-            for (int j = rank+1; j <= Math.min(rank,colMax); j++) {
-                factor=factor+value*matDisp.getVal(rank,j);
+            for (int j = rank + 1; j <= Math.min(this.n, colMax); j++) {
+                factor = factor + result[0][j - 1] * matDisp.getVal(rank, j);
             }
-            
-
             result[1][rank - 1] = factor;
         }
 
@@ -300,35 +280,46 @@ public class ProblemMatrix {
 
     public static void main(String[] args) {
 
-        int n = 4;
-        int nbVal = 50;
+        int n = 1000;
+        int nbVal = 500;
 
         ProblemMatrix pbMat = new ProblemMatrix(n);
-        pbMat.setVal(1, 1, 4);
-        pbMat.setVal(1, 2, 1);
-        pbMat.setVal(1, 3, 8);
-        pbMat.setVal(1, 4, 2);
-
-        pbMat.setVal(2, 2, 9);
-        pbMat.setVal(2, 3, 2);
-        pbMat.setVal(2, 4, 0);
-
-        pbMat.setVal(3, 3, 6);
-        pbMat.setVal(3, 4, 1);
-
-        pbMat.setVal(4, 4, 6);
+        for (int i = 1; i <= n; i++) {
+            for (int j = i; j <= n; j++) {
+                double value = Math.random() * 10 - 5;
+                pbMat.setVal(i, j, value);
+            }
+        }
 
         System.out.println("pbMat:");
-        System.out.println(pbMat.toString());
+        //System.out.println(pbMat.toString());
 
         Vector force = new Vector();
-        force.setVal(2, 100);
-        force.setVal(4, 100);
-        //force.setVal(6, 100);
+
+        for (int i = 0; i < 5; i++) {
+
+            int rank = (int) Math.round(Math.random() * n + 1);
+            double value = Math.random() * 1000;
+            if (rank > n) {
+                rank = n;
+            }
+
+            force.setVal(rank, value);
+        }
 
         Vector disp = new Vector();
-        disp.setVal(1, 1);
-        //disp.setVal(7, 1);
+
+        for (int i = 0; i < 5; i++) {
+
+            int rank = (int) Math.round(Math.random() * n + 1);
+            double value = Math.random() * 10 - 5;
+
+            if (rank > n) {
+                rank = n;
+            }
+
+            disp.setVal(rank, value);
+        }
 
         System.out.println("force:");
         System.out.println(force.toString());
