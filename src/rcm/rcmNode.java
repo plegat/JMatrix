@@ -17,20 +17,28 @@ import java.util.ArrayList;
 public class rcmNode implements Comparable<rcmNode> {
     
     int id;
-    ArrayList<Integer> adjacents;
+    ArrayList<rcmNode> adjacents;
 
     public rcmNode(int id) {
         this.id = id;
         this.adjacents=new ArrayList<>();
     }
     
-    public void addAdjacent(int adj) {
+    public int getId() {
+        return this.id;
+    }
+    
+    public void addAdjacent(rcmNode adj) {
         
         if (this.adjacents.indexOf(adj)==-1) {
             this.adjacents.add(adj);
         }
     }
 
+    public rcmNode[] getAdjacents() {
+        return this.adjacents.toArray(new rcmNode[this.adjacents.size()]);
+    }
+    
     public int getDegree() {
         return this.adjacents.size();
     }
@@ -48,21 +56,6 @@ public class rcmNode implements Comparable<rcmNode> {
     }
 
     
-    
-    public static void main(String[] args) {
-        
-        rcmNode node1=new rcmNode(1);
-        
-        rcmNode node2=new rcmNode(1);
-        node2.addAdjacent(2);
-        node2.addAdjacent(3);
-        node2.addAdjacent(4);
-        
-        System.out.println(node1.compareTo(node2));
-        
-        
-        
-    }
     
     
     
