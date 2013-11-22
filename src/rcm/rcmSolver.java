@@ -20,7 +20,6 @@ public class rcmSolver {
         this.result = new rcmQueue();
         this.temp = new rcmQueue();
         this.temp2 = new rcmQueue();
-
     }
 
     public int[] solve() {
@@ -41,10 +40,6 @@ public class rcmSolver {
                 this.temp.addNotIn(node.getAdjacents(),this.result);
                 this.temp.sort();
 
-                System.out.println("adding " + node.getId() + " from G to R");
-                System.out.println("result: " + result.toString());
-                System.out.println("temp: " + temp.toString());
-
                 while (this.temp.getNbElements() > 0) {
 
                     this.temp2.init();
@@ -58,32 +53,19 @@ public class rcmSolver {
                         this.temp2.sort();
 
                         this.temp.add(this.temp2.getAll());
-
-                        System.out.println("adding " + node2.getId() + " from Temp to R");
-                        System.out.println("result: " + result.toString());
-                        System.out.println("temp: " + temp.toString());
-                    } else {
-                        System.out.println("node " + node2.getId() + " already in R");
-                    }
-
+                    } 
                 }
-
-            } else {
-                System.out.println("node " + node.getId() + " already in R");
-            }
-
+            } 
         }
 
         int nbElements = this.result.getNbElements();
         int[] ranks = new int[nbElements];
 
         for (int i = 0; i < nbElements; i++) {
-
             ranks[nbElements - i - 1] = this.result.getFirst().getId();
         }
 
         return ranks;
-
     }
 
     public static void main(String[] args) {
