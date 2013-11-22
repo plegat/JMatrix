@@ -31,19 +31,21 @@ public class rcmQueue {
     }
 
     public void add(rcmNode node) {
-        if (this.queue.indexOf(node) < 0) {
+        if ((node != null) && (this.queue.indexOf(node) < 0)) {
             this.queue.add(node);
         }
     }
 
     public void add(rcmNode[] nodes) {
         for (rcmNode node : nodes) {
-            this.add(node);
+            if (node != null) {
+                this.add(node);
+            }
         }
     }
 
     public void remove(rcmNode node) {
-        if (this.queue.indexOf(node) > -1) {
+        if ((node != null) && (this.queue.indexOf(node) > -1)) {
             this.queue.remove(node);
         }
     }
@@ -63,18 +65,17 @@ public class rcmQueue {
         }
 
     }
-    
+
     public rcmNode[] getAll() {
-        if (this.getNbElements()>0) {
+        if (this.getNbElements() > 0) {
             return this.queue.toArray(new rcmNode[this.queue.size()]);
         } else {
             return null;
         }
     }
-    
+
     public boolean isInQueue(rcmNode node) {
-        return (this.queue.indexOf(node)>-1);
+        return (this.queue.indexOf(node) > -1);
     }
-    
 
 }

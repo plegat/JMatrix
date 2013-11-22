@@ -65,11 +65,70 @@ public class rcmSolver {
         
         for (int i = 0; i < nbElements; i++) {
             
-            ranks[i]=this.result.getFirst().getId();
+            ranks[nbElements-i-1]=this.result.getFirst().getId();
         }
         
         return ranks;
 
+    }
+    
+    
+    public static void main(String[] args) {
+        
+        rcmNode[] node=new rcmNode[11];
+        
+        for (int i = 1; i < 11; i++) {
+            node[i] = new rcmNode(i);
+        }
+        
+        node[1].addAdjacent(node[2]);
+        node[1].addAdjacent(node[4]);
+        
+        node[2].addAdjacent(node[1]);
+        node[2].addAdjacent(node[3]);
+        node[2].addAdjacent(node[5]);
+        node[2].addAdjacent(node[6]);
+        
+        node[3].addAdjacent(node[2]);
+        node[3].addAdjacent(node[6]);
+        
+        node[4].addAdjacent(node[1]);
+        node[4].addAdjacent(node[5]);
+        node[4].addAdjacent(node[8]);
+        
+        node[5].addAdjacent(node[2]);
+        node[5].addAdjacent(node[4]);
+        node[5].addAdjacent(node[6]);
+        node[5].addAdjacent(node[7]);
+        
+        node[6].addAdjacent(node[2]);
+        node[6].addAdjacent(node[3]);
+        node[6].addAdjacent(node[5]);
+        node[6].addAdjacent(node[9]);
+        
+        node[7].addAdjacent(node[5]);
+        node[7].addAdjacent(node[9]);
+        node[7].addAdjacent(node[10]);
+        
+        node[8].addAdjacent(node[4]);
+        
+        node[9].addAdjacent(node[6]);
+        node[9].addAdjacent(node[7]);
+        node[9].addAdjacent(node[10]);
+        
+        node[10].addAdjacent(node[7]);
+        node[10].addAdjacent(node[9]);
+        
+        System.out.println("degrés:");
+        for (int i = 1; i < 11; i++) {
+            System.out.println("noeud "+i+": "+node[i].getDegree()); 
+        }
+        
+        rcmQueue nodes=new rcmQueue();
+        nodes.add(node);
+        
+        
+        
     }
 
 }
