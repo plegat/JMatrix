@@ -38,97 +38,116 @@ public class rcmSolver {
 
                 this.result.add(node);
 
-                this.temp.add(node.getAdjacents());
+                this.temp.addNotIn(node.getAdjacents(),this.result);
                 this.temp.sort();
+
+                System.out.println("adding " + node.getId() + " from G to R");
+                System.out.println("result: " + result.toString());
+                System.out.println("temp: " + temp.toString());
 
                 while (this.temp.getNbElements() > 0) {
 
                     this.temp2.init();
 
                     rcmNode node2 = this.temp.getFirst();
-                    
-                    if (!this.result.isInQueue(node)) {
+
+                    if (!this.result.isInQueue(node2)) {
                         this.result.add(node2);
 
-                        this.temp2.add(node2.getAdjacents());
+                        this.temp2.addNotIn(node2.getAdjacents(),this.result);
                         this.temp2.sort();
 
                         this.temp.add(this.temp2.getAll());
+
+                        System.out.println("adding " + node2.getId() + " from Temp to R");
+                        System.out.println("result: " + result.toString());
+                        System.out.println("temp: " + temp.toString());
+                    } else {
+                        System.out.println("node " + node2.getId() + " already in R");
                     }
 
                 }
+
+            } else {
+                System.out.println("node " + node.getId() + " already in R");
             }
+
         }
 
-        int nbElements=this.result.getNbElements();
+        int nbElements = this.result.getNbElements();
         int[] ranks = new int[nbElements];
-        
+
         for (int i = 0; i < nbElements; i++) {
-            
-            ranks[nbElements-i-1]=this.result.getFirst().getId();
+
+            ranks[nbElements - i - 1] = this.result.getFirst().getId();
         }
-        
+
         return ranks;
 
     }
-    
-    
+
     public static void main(String[] args) {
-        
-        rcmNode[] node=new rcmNode[11];
-        
+
+        rcmNode[] node = new rcmNode[11];
+
         for (int i = 1; i < 11; i++) {
             node[i] = new rcmNode(i);
         }
-        
+
         node[1].addAdjacent(node[2]);
         node[1].addAdjacent(node[4]);
-        
+
         node[2].addAdjacent(node[1]);
         node[2].addAdjacent(node[3]);
         node[2].addAdjacent(node[5]);
         node[2].addAdjacent(node[6]);
-        
+
         node[3].addAdjacent(node[2]);
         node[3].addAdjacent(node[6]);
-        
+
         node[4].addAdjacent(node[1]);
         node[4].addAdjacent(node[5]);
         node[4].addAdjacent(node[8]);
-        
+
         node[5].addAdjacent(node[2]);
         node[5].addAdjacent(node[4]);
         node[5].addAdjacent(node[6]);
         node[5].addAdjacent(node[7]);
-        
+
         node[6].addAdjacent(node[2]);
         node[6].addAdjacent(node[3]);
         node[6].addAdjacent(node[5]);
         node[6].addAdjacent(node[9]);
-        
+
         node[7].addAdjacent(node[5]);
         node[7].addAdjacent(node[9]);
         node[7].addAdjacent(node[10]);
-        
+
         node[8].addAdjacent(node[4]);
-        
+
         node[9].addAdjacent(node[6]);
         node[9].addAdjacent(node[7]);
         node[9].addAdjacent(node[10]);
-        
+
         node[10].addAdjacent(node[7]);
         node[10].addAdjacent(node[9]);
-        
+
         System.out.println("degrés:");
         for (int i = 1; i < 11; i++) {
-            System.out.println("noeud "+i+": "+node[i].getDegree()); 
+            System.out.println("noeud " + i + ": " + node[i].getDegree());
         }
-        
-        rcmQueue nodes=new rcmQueue();
+
+        rcmQueue nodes = new rcmQueue();
         nodes.add(node);
-        
-        
-        
+
+        rcmSolver solver = new rcmSolver(nodes);
+        int[] result = solver.solve();
+
+        for (int i = 0; i < result.length; i++) {
+
+            System.out.println("rang " + (i + 1) + ": " + result[i]);
+        }
+
     }
 
 }

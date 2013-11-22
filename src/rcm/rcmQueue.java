@@ -36,9 +36,25 @@ public class rcmQueue {
         }
     }
 
+    public void addNotIn(rcmNode node, rcmQueue queue) {
+        if ((node != null) && (!queue.isInQueue(node)) && (this.queue.indexOf(node) < 0)) {
+            this.queue.add(node);
+        }
+    }
+
     public void add(rcmNode[] nodes) {
+        if (nodes != null) {
+            for (rcmNode node : nodes) {
+                if (node != null) {
+                    this.add(node);
+                }
+            }
+        }
+    }
+
+    public void addNotIn(rcmNode[] nodes, rcmQueue queue) {
         for (rcmNode node : nodes) {
-            if (node != null) {
+            if ((node != null) && (!queue.isInQueue(node))) {
                 this.add(node);
             }
         }
@@ -76,6 +92,25 @@ public class rcmQueue {
 
     public boolean isInQueue(rcmNode node) {
         return (this.queue.indexOf(node) > -1);
+    }
+
+    public String toString() {
+
+        StringBuilder sb = new StringBuilder();
+
+        if (this.getNbElements() > 0) {
+            for (int i = 0; i < this.queue.size(); i++) {
+                sb.append(this.queue.get(i).getId());
+                if (i < this.queue.size() - 1) {
+                    sb.append("-");
+                }
+            }
+        } else {
+            sb.append("empty");
+        }
+
+        return sb.toString();
+
     }
 
 }
