@@ -8,7 +8,7 @@
  * or send a letter to Creative Commons, 444 Castro Street, Suite 900, Mountain View, California, 94041, USA.   
  */
 
-package jmatrix;
+package plegat.jmatrix;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
