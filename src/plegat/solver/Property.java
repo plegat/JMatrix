@@ -17,11 +17,11 @@ package plegat.solver;
 public class Property {
     
     private Material mat;
-    private double thickness;
+    private double[] data;
 
-    public Property(Material mat, double thickness) {
+    public Property(Material mat, double[] data) {
         this.mat = mat;
-        this.thickness = thickness;
+        this.data = data;
     }
 
     public Material getMat() {
@@ -32,12 +32,12 @@ public class Property {
         this.mat = mat;
     }
 
-    public double getThickness() {
-        return thickness;
+    public double[] getData() {
+        return data;
     }
 
-    public void setThickness(double thickness) {
-        this.thickness = thickness;
+    public void setData(double[] data) {
+        this.data = data;
     }
     
     

@@ -21,5 +21,49 @@ public class ElementGroup {
     private ArrayList<Element> elements;
     private Property prop;
     private String id;
+
+    public ElementGroup(String id) {
+        this.id = id;
+    }
+
+    public ElementGroup(String id, ArrayList<Element> elements) {
+        this.id = id;
+        this.elements = elements;
+        
+    }
+
+    public ElementGroup(String id, ArrayList<Element> elements, Property prop) {
+        this.id = id;
+        this.elements = elements;
+        this.prop = prop;
+        
+    }
+
+    public ArrayList<Element> getElements() {
+        return elements;
+    }
+
+    public void setElements(ArrayList<Element> elements) {
+        this.elements = elements;
+    }
+
+    public Property getProp() {
+        return prop;
+    }
+
+    public void setProp(Property prop) {
+        this.prop = prop;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+    
+    
+    
     
 }

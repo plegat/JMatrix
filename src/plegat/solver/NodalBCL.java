@@ -16,35 +16,43 @@ import java.util.ArrayList;
  *
  * @author Jean-Michel BORLOT
  */
-public class NodeGroup {
+public class NodalBCL {
     
-    private ArrayList<Node> nodes;
-    private String id;
+    private int type;
+    public static int NODAL_DISP=1;
+    public static int NODAL_FORCE=2;
+    private ArrayList<Node> zone;
 
-    public NodeGroup(String id) {
-        this.id = id;
+    public NodalBCL(int type) {
+        this.type = type;
     }
 
-    public NodeGroup(String id, ArrayList<Node> nodes) {
-        this.id = id;
-        this.nodes = nodes;
-        
+    public NodalBCL(int type, ArrayList zone) {
+        this.type = type;
+        this.zone = zone;
     }
 
-    public ArrayList<Node> getNodes() {
-        return nodes;
+    public int getType() {
+        return type;
     }
 
-    public void setNodes(ArrayList<Node> nodes) {
-        this.nodes = nodes;
+    public void setType(int type) {
+        this.type = type;
     }
 
-    public String getId() {
-        return id;
+    public ArrayList<Node> getZone() {
+        return zone;
     }
 
-    public void setId(String id) {
-        this.id = id;
+    public void setZone(ArrayList<Node> zone) {
+        this.zone = zone;
+    }
+    
+    
+    public void addNode(Node node) {
+        if (this.zone.indexOf(node)<0) {
+            this.zone.add(node);
+        }
     }
     
     
