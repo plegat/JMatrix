@@ -10,12 +10,93 @@
 
 package plegat.io;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import plegat.solver.Mesh;
+
 /**
  *
  * @author Jean-Michel BORLOT
  */
 public class InputFileReader {
     
+    private String path;
+    private Mesh mesh;
+
+    public InputFileReader(String path, Mesh mesh) {
+        this.path = path;
+        this.mesh = mesh;
+    }
+
+    public InputFileReader() {
+    }
+
+    public String getPath() {
+        return path;
+    }
+
+    public void setPath(String path) {
+        this.path = path;
+    }
+
+    public Mesh getMesh() {
+        return mesh;
+    }
+
+    public void setMesh(Mesh mesh) {
+        this.mesh = mesh;
+    }
+    
+    public boolean read() {
+        
+        try {
+            
+            BufferedReader br=new BufferedReader(new FileReader(new File(path)));
+            
+            
+            // premier boucle: lecture des noeuds
+            
+            String texte;
+            
+            while ((texte=br.readLine())!=null) {
+                System.out.println(texte);
+            }
+            
+            // TODO la suite
+            
+            
+            
+            br.close();
+        
+            return true;
+            
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(InputFileReader.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException ex) {
+            Logger.getLogger(InputFileReader.class.getName()).log(Level.SEVERE, null, ex);
+        } 
+        
+        return false;
+        
+        
+    }
+    
+    public static void main(String[] args) {
+        
+        
+        InputFileReader ifr=new InputFileReader("/home/jmb2/Bureau/sauvegarde_04jul2010.xml", null);
+        
+        boolean flag=ifr.read();
+        
+        System.out.println("flag: "+flag);
+        
+        
+    }
     
     
     
