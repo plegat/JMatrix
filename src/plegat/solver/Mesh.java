@@ -10,6 +10,8 @@
 package plegat.solver;
 
 import java.util.ArrayList;
+import plegat.jmatrix.ProblemMatrix;
+import plegat.jmatrix.Vector;
 
 /**
  *
@@ -90,6 +92,71 @@ public class Mesh {
         if (this.nodalBcl.indexOf(nbcl)<0) {
             this.nodalBcl.add(nbcl);
         }
+    }
+    
+    
+    public ProblemMatrix getMatrix() {
+        
+        int matrixSize=this.nodes.size()*3;
+        
+        ProblemMatrix pbmat=new ProblemMatrix(matrixSize);
+        
+        
+        
+        
+        return pbmat;
+        
+    }
+    
+    public Vector getDisp() {
+        
+        Vector disp=new Vector();
+        
+        
+        
+        
+        return disp;
+        
+    }
+    
+    public Vector getLoad() {
+        
+        Vector load=new Vector();
+        
+        
+        
+        return load;
+        
+    }
+    
+    public Node getNode(int rank) {
+        
+        if (rank<this.nodes.size()) {
+            return this.nodes.get(rank);
+        } else {
+            return null;
+        }
+    }
+    
+    public Element getElement(int rank) {
+        
+        if (rank<this.elements.size()) {
+            return this.elements.get(rank);
+        } else {
+            return null;
+        }
+    }
+    
+    public int[] getRCMOptimization() {
+        
+        int[] rcmResult=new int[this.nodes.size()];
+        
+        
+        
+        
+        return rcmResult;
+        
+        
     }
     
     
