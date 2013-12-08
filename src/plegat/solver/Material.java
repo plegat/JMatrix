@@ -16,12 +16,22 @@ package plegat.solver;
  */
 public class Material {
     
+    private String name;
     private double modulus;
     private double nu;
 
-    public Material(double modulus, double nu) {
+    public Material(String name, double modulus, double nu) {
+        this.name=name;
         this.modulus = modulus;
         this.nu = nu;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     public double getModulus() {

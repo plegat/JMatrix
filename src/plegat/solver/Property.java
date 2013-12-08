@@ -16,12 +16,27 @@ package plegat.solver;
  */
 public class Property {
     
+    private String name;
     private Material mat;
     private double[] data;
-
-    public Property(Material mat, double[] data) {
+    private int type;
+    public static int BAR=0;
+    public static int BEAM=1;
+    public static int SHELL=2;
+    
+    public Property(String name,Material mat, double[] data, int type) {
+        this.name=name;
         this.mat = mat;
         this.data = data;
+        this.type=type;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     public Material getMat() {
@@ -39,6 +54,15 @@ public class Property {
     public void setData(double[] data) {
         this.data = data;
     }
+
+    public int getType() {
+        return type;
+    }
+
+    public void setType(int type) {
+        this.type = type;
+    }
+    
     
     
     

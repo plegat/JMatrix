@@ -22,6 +22,9 @@ public class ElementGroup {
     private Property prop;
     private String id;
 
+    public ElementGroup() {
+    }
+
     public ElementGroup(String id) {
         this.id = id;
     }

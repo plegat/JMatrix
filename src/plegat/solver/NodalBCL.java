@@ -22,6 +22,7 @@ public class NodalBCL {
     public static int NODAL_DISP=1;
     public static int NODAL_FORCE=2;
     private ArrayList<Node> zone;
+    private double[] data;
 
     public NodalBCL(int type) {
         this.type = type;
@@ -30,6 +31,12 @@ public class NodalBCL {
     public NodalBCL(int type, ArrayList zone) {
         this.type = type;
         this.zone = zone;
+    }
+
+    public NodalBCL(int type, ArrayList<Node> zone, double[] data) {
+        this.type = type;
+        this.zone = zone;
+        this.data = data;
     }
 
     public int getType() {

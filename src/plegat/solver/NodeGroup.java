@@ -21,6 +21,9 @@ public class NodeGroup {
     private ArrayList<Node> nodes;
     private String id;
 
+    public NodeGroup() {
+    }
+
     public NodeGroup(String id) {
         this.id = id;
     }
@@ -28,7 +31,6 @@ public class NodeGroup {
     public NodeGroup(String id, ArrayList<Node> nodes) {
         this.id = id;
         this.nodes = nodes;
-        
     }
 
     public ArrayList<Node> getNodes() {
