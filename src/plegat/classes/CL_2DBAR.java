@@ -50,10 +50,10 @@ public class CL_2DBAR {
                     String[] data=texte.split(",");
                     
                     Node[] nodes=new Node[2];
-                    nodes[0]=mesh.getNodeByID(Integer.parseInt(data[1]));
-                    nodes[1]=mesh.getNodeByID(Integer.parseInt(data[2]));
+                    nodes[0]=mesh.getNodeByID(data[1].trim());
+                    nodes[1]=mesh.getNodeByID(data[2].trim());
                     
-                    Element elm=new Element(Integer.parseInt(data[0]), nodes, Element.ROD2);
+                    Element elm=new Element(data[0].trim(), nodes, Element.ROD2);
                     
                     mesh.addElement(elm);
                 }

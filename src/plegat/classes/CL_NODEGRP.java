@@ -61,7 +61,7 @@ public class CL_NODEGRP {
                         String[] data = texte.split(",");
                         
                         for (int i = 0; i < data.length; i++) {
-                            Node node = mesh.getNodeByID(Integer.parseInt(data[i]));
+                            Node node = mesh.getNodeByID(data[i].trim());
                             nodeList.add(node);
                         }
                     }

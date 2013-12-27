@@ -15,7 +15,7 @@ package plegat.solver;
  */
 public class Element {
 
-    private int id;
+    private String id;
     private Node[] nodes;
     private int type;
     public static int ROD2 = 1;
@@ -23,7 +23,7 @@ public class Element {
     public static int TRIA3 = 3;
     public static int QUAD4 = 4;
 
-    public Element(int id, Node[] nodes, int type) {
+    public Element(String id, Node[] nodes, int type) {
         this.id = id;
         this.nodes = nodes;
         this.type = type;
@@ -31,11 +31,11 @@ public class Element {
 
     
     
-    public int getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(String id) {
         this.id = id;
     }
 

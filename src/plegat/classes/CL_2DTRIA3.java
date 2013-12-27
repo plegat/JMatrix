@@ -50,11 +50,11 @@ public class CL_2DTRIA3 {
                     String[] data=texte.split(",");
                     
                     Node[] nodes=new Node[3];
-                    nodes[0]=mesh.getNodeByID(Integer.parseInt(data[1]));
-                    nodes[1]=mesh.getNodeByID(Integer.parseInt(data[2]));
-                    nodes[2]=mesh.getNodeByID(Integer.parseInt(data[3]));
+                    nodes[0]=mesh.getNodeByID(data[1].trim());
+                    nodes[1]=mesh.getNodeByID(data[2].trim());
+                    nodes[2]=mesh.getNodeByID(data[3].trim());
                     
-                    Element elm=new Element(Integer.parseInt(data[0]), nodes, Element.TRIA3);
+                    Element elm=new Element(data[0].trim(), nodes, Element.TRIA3);
                     
                     mesh.addElement(elm);
                 }

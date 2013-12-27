@@ -11,6 +11,7 @@ package plegat.solver;
 
 import java.util.ArrayList;
 import java.util.Hashtable;
+import plegat.io.InputFileReader;
 import plegat.jmatrix.ProblemMatrix;
 import plegat.jmatrix.Vector;
 
@@ -143,14 +144,14 @@ public class Mesh {
         }
     }
 
-    public Node getNodeByID(int id) {
+    public Node getNodeByID(String id) {
 
         int rank = 0;
 
         while (rank < this.nodes.size()) {
 
             Node node = this.nodes.get(rank);
-            if (node.getId() == id) {
+            if (node.getId().equals(id)) {
                 return node;
             } else {
                 rank++;
@@ -176,7 +177,7 @@ public class Mesh {
         while (rank < this.elements.size()) {
 
             Element elm = this.elements.get(rank);
-            if (elm.getId() == id) {
+            if (elm.getId().equals(id)) {
                 return elm;
             } else {
                 rank++;
@@ -298,5 +299,30 @@ public class Mesh {
         return rcmResult;
 
     }
+    
+    
+    
+    public static void main(String[] args) {
+
+        Mesh mesh=new Mesh();
+        
+        
+        InputFileReader ifr = new InputFileReader("/home/jmb2/Bureau/test_pfem.inp", mesh);
+
+        boolean flag = ifr.read();
+
+        if (flag) {
+            System.out.println("============================");
+            System.out.println("= lecture fichier input OK =");
+            System.out.println("============================");
+            
+            
+            
+            
+        } 
+        
+        
+    }
+    
 
 }

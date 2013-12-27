@@ -50,12 +50,12 @@ public class CL_2DQUAD4 {
                     String[] data=texte.split(",");
                     
                     Node[] nodes=new Node[4];
-                    nodes[0]=mesh.getNodeByID(Integer.parseInt(data[1]));
-                    nodes[1]=mesh.getNodeByID(Integer.parseInt(data[2]));
-                    nodes[2]=mesh.getNodeByID(Integer.parseInt(data[3]));
-                    nodes[3]=mesh.getNodeByID(Integer.parseInt(data[4]));
+                    nodes[0]=mesh.getNodeByID(data[1].trim());
+                    nodes[1]=mesh.getNodeByID(data[2].trim());
+                    nodes[2]=mesh.getNodeByID(data[3].trim());
+                    nodes[3]=mesh.getNodeByID(data[4].trim());
                     
-                    Element elm=new Element(Integer.parseInt(data[0]), nodes, Element.QUAD4);
+                    Element elm=new Element(data[0].trim(), nodes, Element.QUAD4);
                     
                     mesh.addElement(elm);
                 }

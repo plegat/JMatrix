@@ -17,9 +17,9 @@ package plegat.solver;
 public class Node {
     
     private double x,y;
-    private int id;
+    private String id;
 
-    public Node(int id, double x, double y) {
+    public Node(String id, double x, double y) {
         this.id = id;
         this.x = x;
         this.y = y;
@@ -41,11 +41,11 @@ public class Node {
         this.y = y;
     }
 
-    public int getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(String id) {
         this.id = id;
     }
     

@@ -47,7 +47,7 @@ public class CL_2DNODE {
                     
                     String[] data=texte.split(",");
                     
-                    Node node=new Node(Integer.parseInt(data[0]), Double.parseDouble(data[1]),Double.parseDouble(data[2]));
+                    Node node=new Node(data[0].trim(), Double.parseDouble(data[1]),Double.parseDouble(data[2]));
                     
                     mesh.addNode(node);
                     
