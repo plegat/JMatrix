@@ -10,6 +10,8 @@
 
 package plegat.solver;
 
+import java.util.ArrayList;
+
 /**
  *
  * @author Jean-Michel BORLOT
@@ -18,11 +20,16 @@ public class Node {
     
     private double x,y;
     private String id;
+    ArrayList<Node> adjacents;
+    private int rcmRank;
+
 
     public Node(String id, double x, double y) {
         this.id = id;
         this.x = x;
         this.y = y;
+        this.adjacents=new ArrayList<>();
+        
     }
 
     public double getX() {
@@ -48,5 +55,27 @@ public class Node {
     public void setId(String id) {
         this.id = id;
     }
+    
+    public void addAdjacent(Node adj) {
+        
+        if (this.adjacents.indexOf(adj)==-1) {
+            this.adjacents.add(adj);
+        }
+    }
+
+    public Node[] getAdjacents() {
+        return this.adjacents.toArray(new Node[this.adjacents.size()]);
+    }
+
+    public int getRcmRank() {
+        return rcmRank;
+    }
+
+    public void setRcmRank(int rcmRank) {
+        this.rcmRank = rcmRank;
+    }
+    
+    
+    
     
 }

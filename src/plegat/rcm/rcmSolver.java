@@ -27,7 +27,7 @@ public class rcmSolver {
         this.temp2 = new rcmQueue();
     }
 
-    public String[] solve() {
+    public int[] solve() {
 
         this.nodes.sort();
         this.result.init();
@@ -64,7 +64,7 @@ public class rcmSolver {
         }
 
         int nbElements = this.result.getNbElements();
-        String[] ranks = new String[nbElements];
+        int[] ranks = new int[nbElements];
 
         for (int i = 0; i < nbElements; i++) {
             ranks[nbElements - i - 1] = this.result.getFirst().getId();
@@ -78,7 +78,7 @@ public class rcmSolver {
         rcmNode[] node = new rcmNode[11];
 
         for (int i = 1; i < 11; i++) {
-            node[i] = new rcmNode("toto_"+i);
+            node[i] = new rcmNode(i);
         }
 
         node[1].addAdjacent(node[2]);
@@ -128,7 +128,7 @@ public class rcmSolver {
         nodes.add(node);
 
         rcmSolver solver = new rcmSolver(nodes);
-        String[] result = solver.solve();
+        int[] result = solver.solve();
 
         for (int i = 0; i < result.length; i++) {
 

@@ -55,6 +55,38 @@ public class Element {
         this.type = type;
     }
 
+    public void initAdjacents() {
+        
+        if ((this.type==ROD2)||(this.type==BEAM2)) {
+            this.nodes[0].addAdjacent(this.nodes[1]);
+            this.nodes[1].addAdjacent(this.nodes[0]);
+        } else if (this.type==TRIA3) {
+            this.nodes[0].addAdjacent(this.nodes[1]);
+            this.nodes[0].addAdjacent(this.nodes[2]);
+            
+            this.nodes[1].addAdjacent(this.nodes[0]);
+            this.nodes[1].addAdjacent(this.nodes[2]);
+            
+            this.nodes[2].addAdjacent(this.nodes[0]);
+            this.nodes[2].addAdjacent(this.nodes[1]);
+        } else if (this.type==QUAD4) {
+            this.nodes[0].addAdjacent(this.nodes[1]);
+            this.nodes[0].addAdjacent(this.nodes[3]);
+            
+            this.nodes[1].addAdjacent(this.nodes[0]);
+            this.nodes[1].addAdjacent(this.nodes[2]);
+            
+            this.nodes[2].addAdjacent(this.nodes[1]);
+            this.nodes[2].addAdjacent(this.nodes[3]);
+            
+            this.nodes[3].addAdjacent(this.nodes[0]);
+            this.nodes[3].addAdjacent(this.nodes[2]);
+            
+        }
+    }
+    
+    
+    
     
     
 }

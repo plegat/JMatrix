@@ -9,11 +9,15 @@
  */
 package plegat.solver;
 
+import com.sun.org.apache.bcel.internal.generic.LoadClass;
 import java.util.ArrayList;
 import java.util.Hashtable;
 import plegat.io.InputFileReader;
 import plegat.jmatrix.ProblemMatrix;
 import plegat.jmatrix.Vector;
+import plegat.rcm.rcmNode;
+import plegat.rcm.rcmQueue;
+import plegat.rcm.rcmSolver;
 
 /**
  *
@@ -30,6 +34,7 @@ public class Mesh {
     private ArrayList<NodalBCL> nodalBcl;
     private Hashtable<Property, ElementGroup> tableElementProperties;
     private ArrayList<Loadcase> loadcases;
+    private int[] rcmOptim;
 
     public Mesh() {
 
@@ -41,7 +46,7 @@ public class Mesh {
         this.elementGroups = new ArrayList<>();
         this.nodalBcl = new ArrayList<>();
         this.tableElementProperties = new Hashtable();
-        this.loadcases=new ArrayList<>();
+        this.loadcases = new ArrayList<>();
     }
 
     public void init() {
@@ -108,7 +113,7 @@ public class Mesh {
             this.loadcases.add(lc);
         }
     }
-    
+
     public ProblemMatrix getMatrix() {
 
         int matrixSize = this.nodes.size() * 3;
@@ -119,7 +124,7 @@ public class Mesh {
 
     }
 
-    public Vector getDisp() {
+    public Vector getDisp(Loadcase lc) {
 
         Vector disp = new Vector();
 
@@ -127,7 +132,7 @@ public class Mesh {
 
     }
 
-    public Vector getLoad() {
+    public Vector getLoad(Loadcase lc) {
 
         Vector load = new Vector();
 
@@ -242,14 +247,13 @@ public class Mesh {
     }
 
     public void listElementGroup() {
-        
+
         for (int i = 0; i < this.elementGroups.size(); i++) {
-            System.out.println("element groupe #"+(i+1)+": "+this.elementGroups.get(i).getId());
+            System.out.println("element groupe #" + (i + 1) + ": " + this.elementGroups.get(i).getId());
         }
-        
+
     }
-    
-    
+
     public ElementGroup getElementGroupByName(String name) {
 
         int rank = 0;
@@ -273,9 +277,9 @@ public class Mesh {
         return this.tableElementProperties.get(prop);
 
     }
-    
+
     public NodalBCL getBCLByName(String name) {
-        
+
         int rank = 0;
 
         while (rank < this.nodalBcl.size()) {
@@ -290,39 +294,74 @@ public class Mesh {
 
         return null;
     }
+
+    public void makeRCMOptimization() {
+
+        int nbNodes=this.nodes.size();
+        
+        rcmQueue nodeQueue = new rcmQueue();
+        rcmNode[] tabrcmNode=new rcmNode[nbNodes];
+        
+        for (int i = 0; i < nbNodes; i++) {
+            tabrcmNode[i]=new rcmNode(i);
+            this.nodes.get(i).setRcmRank(i);
+        }
+        
+        for (int i = 0; i < nbNodes; i++) {
+            
+            Node[] adjacents=this.nodes.get(i).getAdjacents();
+            
+            for (int j = 0; j < adjacents.length; j++) {
+                
+                tabrcmNode[i].addAdjacent(tabrcmNode[adjacents[j].getRcmRank()]);
+                
+            }
+            
+        }
+        
+        for (int i = 0; i < nbNodes; i++) {
+            nodeQueue.add(tabrcmNode);
+        }
+
+        rcmSolver solver = new rcmSolver(nodeQueue);
+        //int[] rcmResult = solver.solve();
+
+        //return rcmResult;
+        
+        this.rcmOptim=solver.solve();
+
+    }
+
+    public int[] getRcmOptim() {
+        return rcmOptim;
+    }
+
     
+    
+    
+    public void initNodeAdjacents() {
+        
+        for (Element elm : this.elements) {
+            elm.initAdjacents();
+        }
+        
+    }
+    
+    public Loadcase getLoadcase(int rank) {
+        
+        if (rank<this.loadcases.size()) {
+            return this.loadcases.get(rank);
+        } else {
+            return null;
+        }
+        
+    }
 
-    public int[] getRCMOptimization() {
-
-        int[] rcmResult = new int[this.nodes.size()];
-
-        return rcmResult;
-
+    public ArrayList<Loadcase> getLoadcases() {
+        return loadcases;
     }
     
     
-    
-    public static void main(String[] args) {
-
-        Mesh mesh=new Mesh();
-        
-        
-        InputFileReader ifr = new InputFileReader("/home/jmb2/Bureau/test_pfem.inp", mesh);
-
-        boolean flag = ifr.read();
-
-        if (flag) {
-            System.out.println("============================");
-            System.out.println("= lecture fichier input OK =");
-            System.out.println("============================");
-            
-            
-            
-            
-        } 
-        
-        
-    }
     
 
 }

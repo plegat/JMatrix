@@ -154,7 +154,7 @@ public class BinaryFileWriter {
 
                 StringBuilder text=new StringBuilder(mesh.getNode(i).getId());
                 
-                text.append("        ", 0, 16-text.length());
+                text.append("                ", 0, 16-text.length());
                 
                 
                 for (int k = 0; k < 3; k++) {
