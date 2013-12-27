@@ -28,6 +28,7 @@ public class Mesh {
     private ArrayList<ElementGroup> elementGroups;
     private ArrayList<NodalBCL> nodalBcl;
     private Hashtable<Property, ElementGroup> tableElementProperties;
+    private ArrayList<Loadcase> loadcases;
 
     public Mesh() {
 
@@ -39,7 +40,7 @@ public class Mesh {
         this.elementGroups = new ArrayList<>();
         this.nodalBcl = new ArrayList<>();
         this.tableElementProperties = new Hashtable();
-
+        this.loadcases=new ArrayList<>();
     }
 
     public void init() {
@@ -52,6 +53,7 @@ public class Mesh {
         this.elementGroups.clear();
         this.nodalBcl.clear();
         this.tableElementProperties.clear();
+        this.loadcases.clear();
     }
 
     public void addNode(Node node) {
@@ -100,6 +102,12 @@ public class Mesh {
         this.tableElementProperties.put(prop, group);
     }
 
+    public void addLoadcase(Loadcase lc) {
+        if (!this.loadcases.contains(lc)) {
+            this.loadcases.add(lc);
+        }
+    }
+    
     public ProblemMatrix getMatrix() {
 
         int matrixSize = this.nodes.size() * 3;
@@ -232,6 +240,15 @@ public class Mesh {
 
     }
 
+    public void listElementGroup() {
+        
+        for (int i = 0; i < this.elementGroups.size(); i++) {
+            System.out.println("element groupe #"+(i+1)+": "+this.elementGroups.get(i).getId());
+        }
+        
+    }
+    
+    
     public ElementGroup getElementGroupByName(String name) {
 
         int rank = 0;
@@ -255,6 +272,24 @@ public class Mesh {
         return this.tableElementProperties.get(prop);
 
     }
+    
+    public NodalBCL getBCLByName(String name) {
+        
+        int rank = 0;
+
+        while (rank < this.nodalBcl.size()) {
+
+            NodalBCL bcl = this.nodalBcl.get(rank);
+            if (bcl.getId().equals(name)) {
+                return bcl;
+            } else {
+                rank++;
+            }
+        }
+
+        return null;
+    }
+    
 
     public int[] getRCMOptimization() {
 

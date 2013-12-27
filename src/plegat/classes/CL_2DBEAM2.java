@@ -60,7 +60,7 @@ public class CL_2DBEAM2 {
                 
             }
         } catch (IOException ex) {
-            Logger.getLogger(CL_2DNODE.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(CL_2DBEAM2.class.getName()).log(Level.SEVERE, null, ex);
         }
         
         return null;

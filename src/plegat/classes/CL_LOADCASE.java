@@ -14,19 +14,22 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import plegat.solver.Element;
+import plegat.solver.Loadcase;
 import plegat.solver.Mesh;
 import plegat.solver.NodalBCL;
+import plegat.solver.Node;
 import plegat.solver.NodeGroup;
 
 /**
  *
  * @author Jean-Michel BORLOT
  */
-public class CL_BCL_LOAD {
+public class CL_LOADCASE {
     
     public String read(BufferedReader br, Mesh mesh) {
         
-        System.out.println("test BCL_LOAD ok");
+        System.out.println("test LOADCASE ok");
 
         String texte;
 
@@ -38,32 +41,33 @@ public class CL_BCL_LOAD {
                 
                 if (texte.startsWith("*")) {
                     
-                    System.out.println("code retour envoi fonction BCL_LOAD: "+texte);
+                    System.out.println("code retour envoi fonction BCL_LOADCASE: "+texte);
                     
                     return texte;
                 } else {
                     
                     System.out.println("ligne: "+texte);
                     
-                    // code specifique BCL_LOAD
+                    // code specifique LOADCASE
                     
                     String[] data=texte.split(",");
+
+                    Loadcase lc=new Loadcase(data[0].trim());
                     
-                    NodeGroup grp=mesh.getNodeGroupByName(data[0]);
-                    
-                    double[] bclData=new double[3];
-                    for (int i = 0; i < 3; i++) {
-                        bclData[i]=Double.parseDouble(data[i+1]);
+                    for (int i = 1; i < data.length; i++) {
+                        NodalBCL bcl=mesh.getBCLByName(data[i].trim());
+                        
+                        if (bcl!=null) {
+                            lc.addBCL(bcl);
+                        }
                     }
                             
-                    NodalBCL bcl=new NodalBCL(NodalBCL.NODAL_FORCE, grp.getNodes() ,bclData);
-                    
-                    mesh.addNodalBCL(bcl);
+                    mesh.addLoadcase(lc);
                 }
                 
             }
         } catch (IOException ex) {
-            Logger.getLogger(CL_2DNODE.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(CL_LOADCASE.class.getName()).log(Level.SEVERE, null, ex);
         }
         
         return null;

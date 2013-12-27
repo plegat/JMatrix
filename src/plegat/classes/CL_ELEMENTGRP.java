@@ -17,7 +17,6 @@ import java.util.logging.Logger;
 import plegat.solver.Element;
 import plegat.solver.ElementGroup;
 import plegat.solver.Mesh;
-import plegat.solver.Node;
 
 /**
  *
@@ -56,6 +55,7 @@ public class CL_ELEMENTGRP {
                     // code specifique ELEMENTGRP
                     if (loop == 0) {
                         eg.setId(texte.trim());
+                        loop++;
                     } else {
 
                         String[] data = texte.split(",");
@@ -74,7 +74,7 @@ public class CL_ELEMENTGRP {
 
             }
         } catch (IOException ex) {
-            Logger.getLogger(CL_2DNODE.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(CL_ELEMENTGRP.class.getName()).log(Level.SEVERE, null, ex);
         }
 
         return null;

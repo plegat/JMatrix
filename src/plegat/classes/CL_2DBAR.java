@@ -60,7 +60,7 @@ public class CL_2DBAR {
                 
             }
         } catch (IOException ex) {
-            Logger.getLogger(CL_2DNODE.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(CL_2DBAR.class.getName()).log(Level.SEVERE, null, ex);
         }
         
         return null;

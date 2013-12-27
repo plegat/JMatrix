@@ -16,31 +16,19 @@ import java.util.ArrayList;
  *
  * @author Jean-Michel BORLOT
  */
-public class NodalBCL {
+public class Loadcase {
     
     private String id;
-    private int type;
-    public static int NODAL_DISP=1;
-    public static int NODAL_FORCE=2;
-    private ArrayList<Node> zone;
-    private double[] data;
+    private ArrayList<NodalBCL> bcl;
 
-    public NodalBCL(String id,int type) {
-        this.id=id;
-        this.type = type;
+    public Loadcase(String id) {
+        this.id = id;
+        this.bcl=new ArrayList<>();
     }
 
-    public NodalBCL(String id,int type, ArrayList zone) {
-        this.id=id;
-        this.type = type;
-        this.zone = zone;
-    }
-
-    public NodalBCL(String id,int type, ArrayList<Node> zone, double[] data) {
-        this.id=id;
-        this.type = type;
-        this.zone = zone;
-        this.data = data;
+    public Loadcase(String id, ArrayList<NodalBCL> bcl) {
+        this.id = id;
+        this.bcl = bcl;
     }
 
     public String getId() {
@@ -51,29 +39,20 @@ public class NodalBCL {
         this.id = id;
     }
 
-    public int getType() {
-        return type;
+    public ArrayList<NodalBCL> getBcl() {
+        return bcl;
     }
 
-    public void setType(int type) {
-        this.type = type;
-    }
-
-    public ArrayList<Node> getZone() {
-        return zone;
-    }
-
-    public void setZone(ArrayList<Node> zone) {
-        this.zone = zone;
+    public void setBcl(ArrayList<NodalBCL> bcl) {
+        this.bcl = bcl;
     }
     
-    
-    public void addNode(Node node) {
-        if (this.zone.indexOf(node)<0) {
-            this.zone.add(node);
+    public void addBCL(NodalBCL newBcl) {
+        
+        if (!this.bcl.contains(newBcl)) {
+            this.bcl.add(newBcl);
         }
+        
     }
-    
-    
     
 }

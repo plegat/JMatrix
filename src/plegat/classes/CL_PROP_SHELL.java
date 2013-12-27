@@ -14,9 +14,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import plegat.solver.Element;
 import plegat.solver.Mesh;
-import plegat.solver.Node;
 import plegat.solver.Property;
 
 /**
@@ -60,7 +58,7 @@ public class CL_PROP_SHELL {
                 
             }
         } catch (IOException ex) {
-            Logger.getLogger(CL_2DNODE.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(CL_PROP_SHELL.class.getName()).log(Level.SEVERE, null, ex);
         }
         
         return null;

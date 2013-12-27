@@ -62,7 +62,7 @@ public class CL_2DQUAD4 {
                 
             }
         } catch (IOException ex) {
-            Logger.getLogger(CL_2DNODE.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(CL_2DQUAD4.class.getName()).log(Level.SEVERE, null, ex);
         }
         
         return null;

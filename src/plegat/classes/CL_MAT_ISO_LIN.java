@@ -55,7 +55,7 @@ public class CL_MAT_ISO_LIN {
                 
             }
         } catch (IOException ex) {
-            Logger.getLogger(CL_2DNODE.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(CL_MAT_ISO_LIN.class.getName()).log(Level.SEVERE, null, ex);
         }
         
         return null;

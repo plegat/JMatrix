@@ -51,21 +51,21 @@ public class CL_BCL_DISP {
                     
                     String[] data=texte.split(",");
                     
-                    NodeGroup grp=mesh.getNodeGroupByName(data[0]);
+                    NodeGroup grp=mesh.getNodeGroupByName(data[1]);
                     
                     double[] bclData=new double[3];
                     for (int i = 0; i < 3; i++) {
-                        bclData[i]=Double.parseDouble(data[i+1]);
+                        bclData[i]=Double.parseDouble(data[i+2]);
                     }
                             
-                    NodalBCL bcl=new NodalBCL(NodalBCL.NODAL_DISP, grp.getNodes() ,bclData);
+                    NodalBCL bcl=new NodalBCL(data[0].trim(),NodalBCL.NODAL_DISP, grp.getNodes() ,bclData);
                     
                     mesh.addNodalBCL(bcl);
                 }
                 
             }
         } catch (IOException ex) {
-            Logger.getLogger(CL_2DNODE.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(CL_BCL_DISP.class.getName()).log(Level.SEVERE, null, ex);
         }
         
         return null;

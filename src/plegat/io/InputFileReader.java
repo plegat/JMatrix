@@ -55,12 +55,15 @@ public class InputFileReader {
 
     public boolean read() {
 
+        
+        String texte=null;
+            
+        
         try {
 
             BufferedReader br = new BufferedReader(new FileReader(new File(path)));
 
             // premier boucle: lecture des noeuds
-            String texte=null;
             boolean flag = true;
             
 
@@ -125,6 +128,9 @@ public class InputFileReader {
         } catch (IllegalArgumentException ex) {
             Logger.getLogger(InputFileReader.class.getName()).log(Level.SEVERE, null, ex);
         } catch (InvocationTargetException ex) {
+            
+            System.out.println("InvocationTargetException, ligne "+texte);
+            
             Logger.getLogger(InputFileReader.class.getName()).log(Level.SEVERE, null, ex);
         } catch (InstantiationException ex) {
             Logger.getLogger(InputFileReader.class.getName()).log(Level.SEVERE, null, ex);
