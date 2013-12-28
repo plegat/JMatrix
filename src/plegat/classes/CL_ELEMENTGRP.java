@@ -32,7 +32,7 @@ public class CL_ELEMENTGRP {
 
         ElementGroup eg = new ElementGroup();
         int loop = 0;
-        ArrayList<Element> elementList=new ArrayList<>();
+        ArrayList<Element> elementList = new ArrayList<>();
 
         try {
 
@@ -41,7 +41,7 @@ public class CL_ELEMENTGRP {
                 texte = texte.trim();
 
                 if (texte.startsWith("*")) {
-                    
+
                     eg.setElements(elementList);
                     mesh.addElementGroup(eg);
 
@@ -50,26 +50,25 @@ public class CL_ELEMENTGRP {
                     return texte;
                 } else {
 
-                    System.out.println("ligne: " + texte);
+                    if (!texte.startsWith("$")) {
+                        System.out.println("ligne: " + texte);
 
-                    // code specifique ELEMENTGRP
-                    if (loop == 0) {
-                        eg.setId(texte.trim());
-                        loop++;
-                    } else {
+                        // code specifique ELEMENTGRP
+                        if (loop == 0) {
+                            eg.setId(texte.trim());
+                            loop++;
+                        } else {
 
-                        String[] data = texte.split(",");
-                        
-                        for (int i = 0; i < data.length; i++) {
-                            Element elm = mesh.getElementByID(Integer.parseInt(data[i]));
-                            elementList.add(elm);
+                            String[] data = texte.split(",");
+
+                            for (int i = 0; i < data.length; i++) {
+                                Element elm = mesh.getElementByID(data[i].trim());
+                                elementList.add(elm);
+                            }
                         }
+
                     }
 
-
-                    
-                    
-                    
                 }
 
             }

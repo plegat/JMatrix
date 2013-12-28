@@ -32,7 +32,7 @@ public class CL_NODEGRP {
 
         NodeGroup ng = new NodeGroup();
         int loop = 0;
-        ArrayList<Node> nodeList=new ArrayList<>();
+        ArrayList<Node> nodeList = new ArrayList<>();
 
         try {
 
@@ -41,7 +41,7 @@ public class CL_NODEGRP {
                 texte = texte.trim();
 
                 if (texte.startsWith("*")) {
-                    
+
                     ng.setNodes(nodeList);
                     mesh.addNodeGroup(ng);
 
@@ -50,26 +50,25 @@ public class CL_NODEGRP {
                     return texte;
                 } else {
 
-                    System.out.println("ligne: " + texte);
+                    if (!texte.startsWith("$")) {
+                        System.out.println("ligne: " + texte);
 
-                    // code specifique NODEGRP
-                    if (loop == 0) {
-                        ng.setId(texte.trim());
-                        loop++;
-                    } else {
+                        // code specifique NODEGRP
+                        if (loop == 0) {
+                            ng.setId(texte.trim());
+                            loop++;
+                        } else {
 
-                        String[] data = texte.split(",");
-                        
-                        for (int i = 0; i < data.length; i++) {
-                            Node node = mesh.getNodeByID(data[i].trim());
-                            nodeList.add(node);
+                            String[] data = texte.split(",");
+
+                            for (int i = 0; i < data.length; i++) {
+                                Node node = mesh.getNodeByID(data[i].trim());
+                                nodeList.add(node);
+                            }
                         }
+
                     }
 
-
-                    
-                    
-                    
                 }
 
             }

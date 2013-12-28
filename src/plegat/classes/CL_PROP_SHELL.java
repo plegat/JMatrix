@@ -7,7 +7,6 @@
  * To view a copy of this license, visit http://creativecommons.org/licenses/by-nc-sa/3.0/ 
  * or send a letter to Creative Commons, 444 Castro Street, Suite 900, Mountain View, California, 94041, USA.   
  */
-
 package plegat.classes;
 
 import java.io.BufferedReader;
@@ -22,9 +21,9 @@ import plegat.solver.Property;
  * @author Jean-Michel BORLOT
  */
 public class CL_PROP_SHELL {
-    
+
     public String read(BufferedReader br, Mesh mesh) {
-        
+
         System.out.println("test PROP_SHELL ok");
 
         String texte;
@@ -33,34 +32,35 @@ public class CL_PROP_SHELL {
 
             while ((texte = br.readLine()) != null) {
 
-                texte=texte.trim();
-                
+                texte = texte.trim();
+
                 if (texte.startsWith("*")) {
-                    
-                    System.out.println("code retour envoi fonction PROP_SHELL: "+texte);
-                    
+
+                    System.out.println("code retour envoi fonction PROP_SHELL: " + texte);
+
                     return texte;
                 } else {
-                    
-                    System.out.println("ligne: "+texte);
-                    
+
+                    if (!texte.startsWith("$")) {
+                        System.out.println("ligne: " + texte);
+
                     // code specifique PROP_SHELL
-                    
-                    String[] data=texte.split(",");
-                    
-                    double[] dataProp=new double[1];
-                    dataProp[0]=Double.parseDouble(data[2]);
-                    
-                    Property prop=new Property(data[0], mesh.getMaterialByName(data[1]),dataProp,Property.SHELL);
-                    
-                    mesh.addProperty(prop);
+                        String[] data = texte.split(",");
+
+                        double[] dataProp = new double[1];
+                        dataProp[0] = Double.parseDouble(data[2]);
+
+                        Property prop = new Property(data[0], mesh.getMaterialByName(data[1]), dataProp, Property.SHELL);
+
+                        mesh.addProperty(prop);
+                    }
                 }
-                
+
             }
         } catch (IOException ex) {
             Logger.getLogger(CL_PROP_SHELL.class.getName()).log(Level.SEVERE, null, ex);
         }
-        
+
         return null;
 
     }

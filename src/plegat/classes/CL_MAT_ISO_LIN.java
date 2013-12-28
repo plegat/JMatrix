@@ -7,7 +7,6 @@
  * To view a copy of this license, visit http://creativecommons.org/licenses/by-nc-sa/3.0/ 
  * or send a letter to Creative Commons, 444 Castro Street, Suite 900, Mountain View, California, 94041, USA.   
  */
-
 package plegat.classes;
 
 import java.io.BufferedReader;
@@ -22,9 +21,9 @@ import plegat.solver.Mesh;
  * @author Jean-Michel BORLOT
  */
 public class CL_MAT_ISO_LIN {
-    
+
     public String read(BufferedReader br, Mesh mesh) {
-        
+
         System.out.println("test MAT_ISO_LIN ok");
 
         String texte;
@@ -33,31 +32,32 @@ public class CL_MAT_ISO_LIN {
 
             while ((texte = br.readLine()) != null) {
 
-                texte=texte.trim();
-                
+                texte = texte.trim();
+
                 if (texte.startsWith("*")) {
-                    
-                    System.out.println("code retour envoi fonction MAT_ISO_LIN: "+texte);
-                    
+
+                    System.out.println("code retour envoi fonction MAT_ISO_LIN: " + texte);
+
                     return texte;
                 } else {
-                    
-                    System.out.println("ligne: "+texte);
-                    
+
+                    if (!texte.startsWith("$")) {
+                        System.out.println("ligne: " + texte);
+
                     // code specifique MAT_ISO_LIN
-                    
-                    String[] data=texte.split(",");
-                    
-                    Material mat=new Material(data[0], Double.parseDouble(data[1]), Double.parseDouble(data[2]));
-                    
-                    mesh.addMaterial(mat);
+                        String[] data = texte.split(",");
+
+                        Material mat = new Material(data[0], Double.parseDouble(data[1]), Double.parseDouble(data[2]));
+
+                        mesh.addMaterial(mat);
+                    }
                 }
-                
+
             }
         } catch (IOException ex) {
             Logger.getLogger(CL_MAT_ISO_LIN.class.getName()).log(Level.SEVERE, null, ex);
         }
-        
+
         return null;
 
     }

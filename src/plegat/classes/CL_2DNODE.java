@@ -23,7 +23,7 @@ import plegat.solver.Node;
 public class CL_2DNODE {
 
     public String read(BufferedReader br, Mesh mesh) {
-        
+
         System.out.println("test 2DNODE ok");
 
         String texte;
@@ -32,32 +32,32 @@ public class CL_2DNODE {
 
             while ((texte = br.readLine()) != null) {
 
-                texte=texte.trim();
-                
+                texte = texte.trim();
+
                 if (texte.startsWith("*")) {
-                    
-                    System.out.println("code retour envoi fonction 2DNODE: "+texte);
-                    
+
+                    System.out.println("code retour envoi fonction 2DNODE: " + texte);
+
                     return texte;
                 } else {
-                    
-                    System.out.println("ligne: "+texte);
-                    
+
+                    if (!texte.startsWith("$")) {
+                        System.out.println("ligne: " + texte);
+
                     //code specifique 2DNODE
-                    
-                    String[] data=texte.split(",");
-                    
-                    Node node=new Node(data[0].trim(), Double.parseDouble(data[1]),Double.parseDouble(data[2]));
-                    
-                    mesh.addNode(node);
-                    
+                        String[] data = texte.split(",");
+
+                        Node node = new Node(data[0].trim(), Double.parseDouble(data[1]), Double.parseDouble(data[2]));
+
+                        mesh.addNode(node);
+                    }
                 }
-                
+
             }
         } catch (IOException ex) {
             Logger.getLogger(CL_2DNODE.class.getName()).log(Level.SEVERE, null, ex);
         }
-        
+
         return null;
 
     }

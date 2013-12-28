@@ -7,7 +7,6 @@
  * To view a copy of this license, visit http://creativecommons.org/licenses/by-nc-sa/3.0/ 
  * or send a letter to Creative Commons, 444 Castro Street, Suite 900, Mountain View, California, 94041, USA.   
  */
-
 package plegat.classes;
 
 import java.io.BufferedReader;
@@ -26,9 +25,9 @@ import plegat.solver.NodeGroup;
  * @author Jean-Michel BORLOT
  */
 public class CL_LOADCASE {
-    
+
     public String read(BufferedReader br, Mesh mesh) {
-        
+
         System.out.println("test LOADCASE ok");
 
         String texte;
@@ -37,39 +36,40 @@ public class CL_LOADCASE {
 
             while ((texte = br.readLine()) != null) {
 
-                texte=texte.trim();
-                
+                texte = texte.trim();
+
                 if (texte.startsWith("*")) {
-                    
-                    System.out.println("code retour envoi fonction BCL_LOADCASE: "+texte);
-                    
+
+                    System.out.println("code retour envoi fonction BCL_LOADCASE: " + texte);
+
                     return texte;
                 } else {
-                    
-                    System.out.println("ligne: "+texte);
-                    
-                    // code specifique LOADCASE
-                    
-                    String[] data=texte.split(",");
 
-                    Loadcase lc=new Loadcase(data[0].trim());
-                    
-                    for (int i = 1; i < data.length; i++) {
-                        NodalBCL bcl=mesh.getBCLByName(data[i].trim());
-                        
-                        if (bcl!=null) {
-                            lc.addBCL(bcl);
+                    if (!texte.startsWith("$")) {
+                        System.out.println("ligne: " + texte);
+
+                    // code specifique LOADCASE
+                        String[] data = texte.split(",");
+
+                        Loadcase lc = new Loadcase(data[0].trim());
+
+                        for (int i = 1; i < data.length; i++) {
+                            NodalBCL bcl = mesh.getBCLByName(data[i].trim());
+
+                            if (bcl != null) {
+                                lc.addBCL(bcl);
+                            }
                         }
+
+                        mesh.addLoadcase(lc);
                     }
-                            
-                    mesh.addLoadcase(lc);
                 }
-                
+
             }
         } catch (IOException ex) {
             Logger.getLogger(CL_LOADCASE.class.getName()).log(Level.SEVERE, null, ex);
         }
-        
+
         return null;
 
     }

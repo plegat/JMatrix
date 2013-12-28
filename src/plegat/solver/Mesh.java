@@ -9,10 +9,8 @@
  */
 package plegat.solver;
 
-import com.sun.org.apache.bcel.internal.generic.LoadClass;
 import java.util.ArrayList;
 import java.util.Hashtable;
-import plegat.io.InputFileReader;
 import plegat.jmatrix.ProblemMatrix;
 import plegat.jmatrix.Vector;
 import plegat.rcm.rcmNode;
@@ -25,16 +23,19 @@ import plegat.rcm.rcmSolver;
  */
 public class Mesh {
 
-    private ArrayList<Node> nodes;
-    private ArrayList<Element> elements;
-    private ArrayList<Property> properties;
-    private ArrayList<Material> materials;
-    private ArrayList<NodeGroup> nodeGroups;
-    private ArrayList<ElementGroup> elementGroups;
-    private ArrayList<NodalBCL> nodalBcl;
-    private Hashtable<Property, ElementGroup> tableElementProperties;
-    private ArrayList<Loadcase> loadcases;
+    private final ArrayList<Node> nodes;
+    private final ArrayList<Element> elements;
+    private final ArrayList<Property> properties;
+    private final ArrayList<Material> materials;
+    private final ArrayList<NodeGroup> nodeGroups;
+    private final ArrayList<ElementGroup> elementGroups;
+    private final ArrayList<NodalBCL> nodalBcl;
+    private final Hashtable<Property, ElementGroup> tableElementProperties;
+    private final ArrayList<Loadcase> loadcases;
     private int[] rcmOptim;
+    private int[] rcmOptimInverse;
+
+    private static final double __RZ_STIFF__ = 1e-6;
 
     public Mesh() {
 
@@ -47,6 +48,8 @@ public class Mesh {
         this.nodalBcl = new ArrayList<>();
         this.tableElementProperties = new Hashtable();
         this.loadcases = new ArrayList<>();
+        this.rcmOptim = null;
+        this.rcmOptimInverse = null;
     }
 
     public void init() {
@@ -60,6 +63,8 @@ public class Mesh {
         this.nodalBcl.clear();
         this.tableElementProperties.clear();
         this.loadcases.clear();
+        this.rcmOptim = null;
+        this.rcmOptimInverse = null;
     }
 
     public void addNode(Node node) {
@@ -120,6 +125,151 @@ public class Mesh {
 
         ProblemMatrix pbmat = new ProblemMatrix(matrixSize);
 
+        if (this.rcmOptim == null) {
+            this.makeRCMOptimization();
+        }
+
+        int nbElements = this.elements.size();
+
+        System.out.println("Nombre d'éléments à traiter: " + nbElements);
+
+        for (int i = 0; i < nbElements; i++) {
+
+            Element elm = this.elements.get(i);
+            System.out.println("element " + elm.getId());
+
+            double[][] matrix = elm.getElementMatrix();
+
+            if (matrix != null) {
+                int nbligne = matrix.length;
+                int nbcol = matrix[0].length;
+
+                for (int j = 0; j < nbligne; j++) {
+                    for (int k = 0; k < nbcol; k++) {
+                        System.out.print(matrix[j][k] + "  ");
+                    }
+                    System.out.println("");
+                }
+
+                if (elm.getType() == Element.ROD2) {
+
+                    int rank1 = this.nodes.indexOf(elm.getNodes()[0]);
+                    int rank2 = this.nodes.indexOf(elm.getNodes()[1]);
+
+                    int matrixLine1 = this.rcmOptimInverse[rank1] * 3 + 1;
+                    int matrixLine2 = this.rcmOptimInverse[rank2] * 3 + 1;
+
+                    System.out.println("ecriture sur ligne " + matrixLine1 + " pour noeud " + elm.getNodes()[0].getId());
+                    System.out.println("ecriture sur ligne " + matrixLine2 + " pour noeud " + elm.getNodes()[1].getId());
+
+                    // ATTENTION: la symétrie est gérée automatiquement par pbmat!!!
+                    pbmat.addVal(matrixLine1, matrixLine1, matrix[0][0]);
+                    pbmat.addVal(matrixLine1, matrixLine1 + 1, matrix[0][1]);
+                    pbmat.addVal(matrixLine1 + 1, matrixLine1 + 1, matrix[1][1]);
+
+                    pbmat.addVal(matrixLine2, matrixLine2, matrix[2][2]);
+                    pbmat.addVal(matrixLine2, matrixLine2 + 1, matrix[2][3]);
+                    pbmat.addVal(matrixLine2 + 1, matrixLine2 + 1, matrix[3][3]);
+
+                    pbmat.addVal(matrixLine1, matrixLine2, matrix[0][2]);
+                    pbmat.addVal(matrixLine1, matrixLine2 + 1, matrix[0][3]);
+                    pbmat.addVal(matrixLine1 + 1, matrixLine2, matrix[1][2]);
+                    pbmat.addVal(matrixLine1 + 1, matrixLine2 + 1, matrix[1][3]);
+
+                    //ajout des raideurs RZ
+                    pbmat.addVal(matrixLine1 + 2, matrixLine1 + 2, __RZ_STIFF__);
+                    pbmat.addVal(matrixLine2 + 2, matrixLine2 + 2, __RZ_STIFF__);
+
+                } else if (elm.getType() == Element.BEAM2) {
+
+                    int rank1 = this.nodes.indexOf(elm.getNodes()[0]);
+                    int rank2 = this.nodes.indexOf(elm.getNodes()[1]);
+
+                    int matrixLine1 = this.rcmOptimInverse[rank1] * 3 + 1;
+                    int matrixLine2 = this.rcmOptimInverse[rank2] * 3 + 1;
+
+                    System.out.println("ecriture sur ligne " + matrixLine1 + " pour noeud " + elm.getNodes()[0].getId());
+                    System.out.println("ecriture sur ligne " + matrixLine2 + " pour noeud " + elm.getNodes()[1].getId());
+
+                    // ATTENTION: la symétrie est gérée automatiquement par pbmat!!!
+                    pbmat.addVal(matrixLine1, matrixLine1, matrix[0][0]);
+                    pbmat.addVal(matrixLine1, matrixLine1 + 1, matrix[0][1]);
+                    pbmat.addVal(matrixLine1, matrixLine1 + 2, matrix[0][2]);
+                    pbmat.addVal(matrixLine1 + 1, matrixLine1 + 1, matrix[1][1]);
+                    pbmat.addVal(matrixLine1 + 1, matrixLine1 + 2, matrix[1][2]);
+                    pbmat.addVal(matrixLine1 + 2, matrixLine1 + 2, matrix[2][2]);
+
+                    pbmat.addVal(matrixLine1, matrixLine2, matrix[0][3]);
+                    pbmat.addVal(matrixLine1, matrixLine2 + 1, matrix[0][4]);
+                    pbmat.addVal(matrixLine1, matrixLine2 + 2, matrix[0][5]);
+                    pbmat.addVal(matrixLine1 + 1, matrixLine2, matrix[1][3]);
+                    pbmat.addVal(matrixLine1 + 1, matrixLine2 + 1, matrix[1][4]);
+                    pbmat.addVal(matrixLine1 + 1, matrixLine2 + 2, matrix[1][5]);
+                    pbmat.addVal(matrixLine1 + 2, matrixLine2 , matrix[2][3]);
+                    pbmat.addVal(matrixLine1 + 2, matrixLine2 + 1, matrix[2][4]);
+                    pbmat.addVal(matrixLine1 + 2, matrixLine2 + 2, matrix[2][5]);
+
+                    pbmat.addVal(matrixLine2, matrixLine2, matrix[3][3]);
+                    pbmat.addVal(matrixLine2, matrixLine2 + 1, matrix[3][4]);
+                    pbmat.addVal(matrixLine2, matrixLine2 + 2, matrix[3][5]);
+                    pbmat.addVal(matrixLine2 + 1, matrixLine2 + 1, matrix[4][4]);
+                    pbmat.addVal(matrixLine2 + 1, matrixLine2 + 2, matrix[4][5]);
+                    pbmat.addVal(matrixLine2 + 2, matrixLine2 + 2, matrix[5][5]);
+
+                } else if (elm.getType() == Element.TRIA3) {
+
+                    int rank1 = this.nodes.indexOf(elm.getNodes()[0]);
+                    int rank2 = this.nodes.indexOf(elm.getNodes()[1]);
+                    int rank3 = this.nodes.indexOf(elm.getNodes()[2]);
+
+                    int matrixLine1 = this.rcmOptimInverse[rank1] * 3 + 1;
+                    int matrixLine2 = this.rcmOptimInverse[rank2] * 3 + 1;
+                    int matrixLine3 = this.rcmOptimInverse[rank3] * 3 + 1;
+
+                    System.out.println("ecriture sur ligne " + matrixLine1 + " pour noeud " + elm.getNodes()[0].getId());
+                    System.out.println("ecriture sur ligne " + matrixLine2 + " pour noeud " + elm.getNodes()[1].getId());
+                    System.out.println("ecriture sur ligne " + matrixLine3 + " pour noeud " + elm.getNodes()[2].getId());
+
+                    // ATTENTION: la symétrie est gérée automatiquement par pbmat!!!
+                    pbmat.addVal(matrixLine1, matrixLine1, matrix[0][0]);
+                    pbmat.addVal(matrixLine1, matrixLine1 + 1, matrix[0][1]);
+                    pbmat.addVal(matrixLine1 + 1, matrixLine1 + 1, matrix[1][1]);
+
+                    pbmat.addVal(matrixLine1, matrixLine2, matrix[0][2]);
+                    pbmat.addVal(matrixLine1, matrixLine2 + 1, matrix[0][3]);
+                    pbmat.addVal(matrixLine1 + 1, matrixLine2, matrix[1][2]);
+                    pbmat.addVal(matrixLine1 + 1, matrixLine2 + 1, matrix[1][3]);
+
+                    pbmat.addVal(matrixLine1, matrixLine3, matrix[0][4]);
+                    pbmat.addVal(matrixLine1, matrixLine3 + 1, matrix[0][5]);
+                    pbmat.addVal(matrixLine1 + 1, matrixLine3, matrix[1][4]);
+                    pbmat.addVal(matrixLine1 + 1, matrixLine3 + 1, matrix[1][5]);
+
+                    pbmat.addVal(matrixLine2, matrixLine2, matrix[2][2]);
+                    pbmat.addVal(matrixLine2, matrixLine2 + 1, matrix[2][3]);
+                    pbmat.addVal(matrixLine2 + 1, matrixLine2 + 1, matrix[3][3]);
+
+                    pbmat.addVal(matrixLine2, matrixLine3, matrix[2][4]);
+                    pbmat.addVal(matrixLine2, matrixLine3 + 1, matrix[2][5]);
+                    pbmat.addVal(matrixLine2 + 1, matrixLine3, matrix[3][4]);
+                    pbmat.addVal(matrixLine2 + 1, matrixLine3 + 1, matrix[3][5]);
+
+                    pbmat.addVal(matrixLine3, matrixLine3, matrix[4][4]);
+                    pbmat.addVal(matrixLine3, matrixLine3 + 1, matrix[4][5]);
+                    pbmat.addVal(matrixLine3 + 1, matrixLine3 + 1, matrix[5][5]);
+
+                    //ajout des raideurs RZ
+                    pbmat.addVal(matrixLine1 + 2, matrixLine1 + 2, __RZ_STIFF__);
+                    pbmat.addVal(matrixLine2 + 2, matrixLine2 + 2, __RZ_STIFF__);
+                    pbmat.addVal(matrixLine3 + 2, matrixLine3 + 2, __RZ_STIFF__);
+
+                } else if (elm.getType() == Element.QUAD4) {
+
+                }
+            }
+
+        }
+
         return pbmat;
 
     }
@@ -128,6 +278,38 @@ public class Mesh {
 
         Vector disp = new Vector();
 
+        if (this.rcmOptim == null) {
+            this.makeRCMOptimization();
+        }
+
+        int nbBcl = this.nodalBcl.size();
+
+        System.out.println("Nombre de BCL à traiter: " + nbBcl);
+
+        for (int i = 0; i < nbBcl; i++) {
+
+            NodalBCL bcl = this.nodalBcl.get(i);
+
+            if (bcl.getType() == NodalBCL.NODAL_DISP) {
+
+                ArrayList<Node> zone = bcl.getZone();
+
+                double[] data = bcl.getData();
+
+                for (Node node : zone) {
+
+                    int rank = this.nodes.indexOf(node);
+                    int vectorLine = this.rcmOptimInverse[rank] * 3 + 1;
+
+                    for (int j = 0; j < 3; j++) {
+                        if (!Double.isNaN(data[j])) {
+                            disp.setVal(vectorLine + j, data[j]);
+                        }
+                    }
+                }
+            }
+        }
+
         return disp;
 
     }
@@ -135,6 +317,38 @@ public class Mesh {
     public Vector getLoad(Loadcase lc) {
 
         Vector load = new Vector();
+
+        if (this.rcmOptim == null) {
+            this.makeRCMOptimization();
+        }
+
+        int nbBcl = this.nodalBcl.size();
+
+        System.out.println("Nombre de BCL à traiter: " + nbBcl);
+
+        for (int i = 0; i < nbBcl; i++) {
+
+            NodalBCL bcl = this.nodalBcl.get(i);
+
+            if (bcl.getType() == NodalBCL.NODAL_FORCE) {
+
+                ArrayList<Node> zone = bcl.getZone();
+
+                double[] data = bcl.getData();
+
+                for (Node node : zone) {
+
+                    int rank = this.nodes.indexOf(node);
+                    int vectorLine = this.rcmOptimInverse[rank] * 3 + 1;
+
+                    for (int j = 0; j < 3; j++) {
+                        if (!Double.isNaN(data[j])) {
+                            load.setVal(vectorLine + j, data[j]);
+                        }
+                    }
+                }
+            }
+        }
 
         return load;
 
@@ -175,7 +389,7 @@ public class Mesh {
         }
     }
 
-    public Element getElementByID(int id) {
+    public Element getElementByID(String id) {
 
         int rank = 0;
 
@@ -297,38 +511,41 @@ public class Mesh {
 
     public void makeRCMOptimization() {
 
-        int nbNodes=this.nodes.size();
-        
+        int nbNodes = this.nodes.size();
+
         rcmQueue nodeQueue = new rcmQueue();
-        rcmNode[] tabrcmNode=new rcmNode[nbNodes];
-        
+        rcmNode[] tabrcmNode = new rcmNode[nbNodes];
+
         for (int i = 0; i < nbNodes; i++) {
-            tabrcmNode[i]=new rcmNode(i);
+            tabrcmNode[i] = new rcmNode(i);
             this.nodes.get(i).setRcmRank(i);
         }
-        
+
         for (int i = 0; i < nbNodes; i++) {
-            
-            Node[] adjacents=this.nodes.get(i).getAdjacents();
-            
+
+            Node[] adjacents = this.nodes.get(i).getAdjacents();
+
             for (int j = 0; j < adjacents.length; j++) {
-                
+
                 tabrcmNode[i].addAdjacent(tabrcmNode[adjacents[j].getRcmRank()]);
-                
+
             }
-            
+
         }
-        
+
         for (int i = 0; i < nbNodes; i++) {
             nodeQueue.add(tabrcmNode);
         }
 
         rcmSolver solver = new rcmSolver(nodeQueue);
-        //int[] rcmResult = solver.solve();
 
-        //return rcmResult;
-        
-        this.rcmOptim=solver.solve();
+        this.rcmOptim = solver.solve();
+
+        this.rcmOptimInverse = new int[nbNodes]; // table permettant de savoir à quelle ligne de la matrice se trouve le noeud i
+
+        for (int i = 0; i < nbNodes; i++) {
+            this.rcmOptimInverse[this.rcmOptim[i]] = i;
+        }
 
     }
 
@@ -336,32 +553,57 @@ public class Mesh {
         return rcmOptim;
     }
 
-    
-    
-    
+    public int[] getRcmOptimInverse() {
+        return rcmOptimInverse;
+    }
+
     public void initNodeAdjacents() {
-        
+
         for (Element elm : this.elements) {
             elm.initAdjacents();
         }
-        
+
     }
-    
+
+    public void initElementProperty() {
+
+        for (Property prop : this.properties) {
+
+            ElementGroup elmGrp = this.getElementGroupByProperty(prop);
+
+            if (elmGrp == null) {
+                System.out.println("elmgroup null for property " + prop.getName() + " !!!");
+            } else {
+
+                System.out.println("element group: " + elmGrp.getId());
+
+                ArrayList<Element> elmList = elmGrp.getElements();
+
+                for (Element element : elmList) {
+
+                    if (element == null) {
+                        System.out.println("element null for property " + prop.getName() + " !!!");
+                    } else {
+
+                        element.setProperty(prop);
+                    }
+                }
+            }
+        }
+    }
+
     public Loadcase getLoadcase(int rank) {
-        
-        if (rank<this.loadcases.size()) {
+
+        if (rank < this.loadcases.size()) {
             return this.loadcases.get(rank);
         } else {
             return null;
         }
-        
+
     }
 
     public ArrayList<Loadcase> getLoadcases() {
         return loadcases;
     }
-    
-    
-    
 
 }

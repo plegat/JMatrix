@@ -7,7 +7,6 @@
  * To view a copy of this license, visit http://creativecommons.org/licenses/by-nc-sa/3.0/ 
  * or send a letter to Creative Commons, 444 Castro Street, Suite 900, Mountain View, California, 94041, USA.   
  */
-
 package plegat.classes;
 
 import java.io.BufferedReader;
@@ -23,9 +22,9 @@ import plegat.solver.Node;
  * @author Jean-Michel BORLOT
  */
 public class CL_2DBEAM2 {
-    
+
     public String read(BufferedReader br, Mesh mesh) {
-        
+
         System.out.println("test 2DBEAM2 ok");
 
         String texte;
@@ -34,35 +33,36 @@ public class CL_2DBEAM2 {
 
             while ((texte = br.readLine()) != null) {
 
-                texte=texte.trim();
-                
+                texte = texte.trim();
+
                 if (texte.startsWith("*")) {
-                    
-                    System.out.println("code retour envoi fonction 2DBEAM2: "+texte);
-                    
+
+                    System.out.println("code retour envoi fonction 2DBEAM2: " + texte);
+
                     return texte;
                 } else {
-                    
-                    System.out.println("ligne: "+texte);
-                    
+
+                    if (!texte.startsWith("$")) {
+                        System.out.println("ligne: " + texte);
+
                     // code specifique 2DBAR
-                    
-                    String[] data=texte.split(",");
-                    
-                    Node[] nodes=new Node[2];
-                    nodes[0]=mesh.getNodeByID(data[1].trim());
-                    nodes[1]=mesh.getNodeByID(data[2].trim());
-                    
-                    Element elm=new Element(data[0].trim(), nodes, Element.BEAM2);
-                    
-                    mesh.addElement(elm);
+                        String[] data = texte.split(",");
+
+                        Node[] nodes = new Node[2];
+                        nodes[0] = mesh.getNodeByID(data[1].trim());
+                        nodes[1] = mesh.getNodeByID(data[2].trim());
+
+                        Element elm = new Element(data[0].trim(), nodes, Element.BEAM2);
+
+                        mesh.addElement(elm);
+                    }
                 }
-                
+
             }
         } catch (IOException ex) {
             Logger.getLogger(CL_2DBEAM2.class.getName()).log(Level.SEVERE, null, ex);
         }
-        
+
         return null;
 
     }

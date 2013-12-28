@@ -7,7 +7,6 @@
  * To view a copy of this license, visit http://creativecommons.org/licenses/by-nc-sa/3.0/ 
  * or send a letter to Creative Commons, 444 Castro Street, Suite 900, Mountain View, California, 94041, USA.   
  */
-
 package plegat.classes;
 
 import java.io.BufferedReader;
@@ -23,9 +22,9 @@ import plegat.solver.NodeGroup;
  * @author Jean-Michel BORLOT
  */
 public class CL_BCL_FORCE {
-    
+
     public String read(BufferedReader br, Mesh mesh) {
-        
+
         System.out.println("test BCL_FORCE ok");
 
         String texte;
@@ -34,38 +33,44 @@ public class CL_BCL_FORCE {
 
             while ((texte = br.readLine()) != null) {
 
-                texte=texte.trim();
-                
+                texte = texte.trim();
+
                 if (texte.startsWith("*")) {
-                    
-                    System.out.println("code retour envoi fonction BCL_FORCE: "+texte);
-                    
+
+                    System.out.println("code retour envoi fonction BCL_FORCE: " + texte);
+
                     return texte;
                 } else {
-                    
-                    System.out.println("ligne: "+texte);
-                    
+
+                    if (!texte.startsWith("$")) {
+                        System.out.println("ligne: " + texte);
+
                     // code specifique BCL_FORCE
-                    
-                    String[] data=texte.split(",");
-                    
-                    NodeGroup grp=mesh.getNodeGroupByName(data[1]);
-                    
-                    double[] bclData=new double[3];
-                    for (int i = 0; i < 3; i++) {
-                        bclData[i]=Double.parseDouble(data[i+2]);
+                        texte=texte.concat(" ");
+                        String[] data = texte.split(",");
+
+                        NodeGroup grp = mesh.getNodeGroupByName(data[1]);
+
+                        double[] bclData = new double[3];
+                        for (int i = 0; i < 3; i++) {
+                            if (data[i + 2].trim().equals("")) {
+                                bclData[i] = Double.NaN;
+                            } else {
+                                bclData[i] = Double.parseDouble(data[i + 2].trim());
+                            }
+                        }
+
+                        NodalBCL bcl = new NodalBCL(data[0].trim(), NodalBCL.NODAL_FORCE, grp.getNodes(), bclData);
+
+                        mesh.addNodalBCL(bcl);
                     }
-                            
-                    NodalBCL bcl=new NodalBCL(data[0].trim(),NodalBCL.NODAL_FORCE, grp.getNodes() ,bclData);
-                    
-                    mesh.addNodalBCL(bcl);
                 }
-                
+
             }
         } catch (IOException ex) {
             Logger.getLogger(CL_BCL_FORCE.class.getName()).log(Level.SEVERE, null, ex);
         }
-        
+
         return null;
 
     }

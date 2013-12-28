@@ -7,7 +7,6 @@
  * To view a copy of this license, visit http://creativecommons.org/licenses/by-nc-sa/3.0/ 
  * or send a letter to Creative Commons, 444 Castro Street, Suite 900, Mountain View, California, 94041, USA.   
  */
-
 package plegat.jmatrix;
 
 /**
@@ -53,6 +52,15 @@ public class ProblemMatrix {
             return this.matUp.getVal(row, col);
         } else {
             return this.matUp.getVal(col, row);
+        }
+    }
+
+    public final void addVal(int row, int col, double value) {
+
+        if (row <= col) {
+            this.matUp.setVal(row, col, this.matUp.getVal(row, col) + value);
+        } else {
+            this.matUp.setVal(col, row, this.matUp.getVal(col, row) + value);
         }
     }
 
@@ -206,7 +214,7 @@ public class ProblemMatrix {
         }
 
         loads.sort();
-        
+
         // decomposition LU
         if (this.state == RAW) {
             this.LUDecomposition();
@@ -226,7 +234,7 @@ public class ProblemMatrix {
             }
             interm[i - 1] = calc;
         }
-        
+
         // resolution matUp.disp=interm
         // resolution
         for (int row = this.matUp.getSize(); row > 0; row--) {
@@ -241,7 +249,7 @@ public class ProblemMatrix {
                 result[0][row - 1] = calc / this.matUp.getVal(row, row);
             }
         }
-        
+
         // insertion des deplacements imposes    
         for (int i = 0; i < nbDisp; i++) {
 
@@ -263,7 +271,6 @@ public class ProblemMatrix {
         }
 
         // calcul des efforts sur deplacement impose
-        
         for (int i = 0; i < nbDisp; i++) {
 
             int rank = displacements.getRankValue(i);

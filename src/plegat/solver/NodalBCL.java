@@ -73,6 +73,23 @@ public class NodalBCL {
             this.zone.add(node);
         }
     }
+
+    public double[] getData() {
+        return data;
+    }
+
+    public double getData(int rank) {
+        return data[rank];
+    }
+    
+    public void setData(double[] data) {
+        this.data = data;
+    }
+    
+    public void setData(int rank,double data) {
+        this.data[rank] = data;
+    }
+    
     
     
     

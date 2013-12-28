@@ -75,7 +75,11 @@ public class Node {
         this.rcmRank = rcmRank;
     }
     
-    
+    public double getDistanceTo(Node nd2) {
+        
+        return Math.sqrt(Math.pow(nd2.x-this.x,2)+Math.pow(nd2.y-this.y,2));
+        
+    }
     
     
 }

@@ -130,22 +130,30 @@ public class BinaryFileWriter {
     public boolean writeProblemTextResults(double[][] results, int[] rcmRanks,Mesh mesh) {
 
         int nbData = results[0].length / 3;
+        System.out.println("nombre de data à écrire dans le fichier résultat: "+nbData);
 
+        double[] ftot=new double[3];
+        for (int i = 0; i < ftot.length; i++) {
+            ftot[i]=0;
+        }
+        
+        
+        
         for (int j = 0; j <= 1; j++) {
-                // j=0: ecriture des déplacements
+            // j=0: ecriture des déplacements
             // j=1: ecriture des efforts/moments
 
             if (j == 0) {
                 this.textResFile.writeln("Resultats des deplacements noeuds:");
                 this.textResFile.writeln("");
-                this.textResFile.writeln("ID NOEUD              DX                 DY               RZ");
+                this.textResFile.writeln("ID NOEUD         DX                      DY                      RZ");
                 
             } else {
                 this.textResFile.writeln("");
                 this.textResFile.writeln("");
                 this.textResFile.writeln("Resultats des efforts et moments aux noeuds:");
                 this.textResFile.writeln("");
-                this.textResFile.writeln("ID NOEUD              FX                 FY               MZ");
+                this.textResFile.writeln("ID NOEUD         FX                      FY                      MZ");
             }
 
             for (int i = 0; i < nbData; i++) {
@@ -158,14 +166,41 @@ public class BinaryFileWriter {
                 
                 
                 for (int k = 0; k < 3; k++) {
-                    String data=String.format("%- 8g", results[j][3 * rank+k]);
+                    String data=String.format("%- 16g", results[j][3 * rank+k]);
                     text.append(data);
                     if (k<2) {
                         text.append("        ");
                     }
+                    
+                    if (j==1) {
+                        ftot[k]=ftot[k]+results[j][3 * rank+k];
+                    }
+                    
                 }
                 
+                this.textResFile.writeln(text.toString());
+                
+                
             }
+            
+            if (j==1) {
+                StringBuilder text=new StringBuilder("TOTAL:");
+                text.append("                ", 0, 16-text.length());
+                
+                for (int k = 0; k < 3; k++) {
+                    String data=String.format("%- 16g", ftot[k]);
+                    text.append(data);
+                    if (k<2) {
+                        text.append("        ");
+                    }
+                    
+                   
+                    
+                }
+                
+                this.textResFile.writeln(text.toString());
+            }
+            
         }
 
         return true;

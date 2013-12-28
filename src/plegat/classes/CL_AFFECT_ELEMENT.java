@@ -42,27 +42,29 @@ public class CL_AFFECT_ELEMENT {
                     return texte;
                 } else {
 
-                    System.out.println("ligne: " + texte);
+                    if (!texte.startsWith("$")) {
+                        System.out.println("ligne: " + texte);
 
-                    // code specifique AFFECT_ELEMENT
-                    String[] data = texte.split(",");
+                        // code specifique AFFECT_ELEMENT
+                        String[] data = texte.split(",");
 
-                    ElementGroup grp = mesh.getElementGroupByName(data[1]);
-                    Property prop = mesh.getPropertyByName(data[0]);
+                        ElementGroup grp = mesh.getElementGroupByName(data[1]);
+                        Property prop = mesh.getPropertyByName(data[0]);
 
-                    if (grp == null) {
-                        System.out.println("grp null");
-                        System.out.println("name: "+data[1]);
-                        mesh.listElementGroup();
+                        if (grp == null) {
+                            System.out.println("grp null");
+                            System.out.println("name: " + data[1]);
+                            mesh.listElementGroup();
+                        }
+                        if (prop == null) {
+                            System.out.println("prop null");
+                        }
+
+                        System.out.println("groupe:   " + grp.getId());
+                        System.out.println("property: " + prop.getName());
+
+                        mesh.addElementGroupProperty(grp, prop);
                     }
-                    if (prop == null) {
-                        System.out.println("prop null");
-                    }
-
-                    System.out.println("groupe:   " + grp.getId());
-                    System.out.println("property: " + prop.getName());
-
-                    mesh.addElementGroupProperty(grp, prop);
                 }
 
             }

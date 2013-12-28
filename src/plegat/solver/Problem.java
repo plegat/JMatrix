@@ -47,30 +47,58 @@ public class Problem {
 
         System.out.println("== initialisation des noeuds adjacents ===");
         this.mesh.initNodeAdjacents();
-        
+        this.mesh.initElementProperty();
 
         String basename;
-        if (this.inputFile.endsWith(".dat")) {
+        if ((this.inputFile.endsWith(".dat")) || (this.inputFile.endsWith(".inp"))) {
             basename = this.inputFile.substring(0, this.inputFile.length() - 4);
         } else {
             basename = this.inputFile;
         }
 
         ProblemMatrix pbmat = mesh.getMatrix();
-        
-        Loadcase lc=mesh.getLoadcase(0);
-        
-        if (lc==null) {
+
+        System.out.println("==================");
+        System.out.println("= Matrice OK !!! =");
+        System.out.println("==================");
+
+        System.out.println(pbmat.toString());
+
+        Loadcase lc = mesh.getLoadcase(0);
+
+        if (lc == null) {
             System.out.println("********************************");
             System.out.println("* Pas de cas de chargement !!! *");
             System.out.println("********************************");
             return 2;
         }
-        
-        Vector disp = mesh.getDisp(lc);
-        Vector load = mesh.getLoad(lc);
 
+        Vector disp = mesh.getDisp(lc);
+        System.out.println("==========================");
+        System.out.println("= Déplacements imposés OK =");
+        System.out.println(disp.toString());
+        System.out.println("==========================");
+
+        Vector load = mesh.getLoad(lc);
+        System.out.println("=================");
+        System.out.println("= Chargement OK =");
+        System.out.println(load.toString());
+        System.out.println("=================");
+        
         double[][] result = pbmat.solve(disp, load);
+        System.out.println("=================");
+        System.out.println("= Résolution OK =");
+        System.out.println("=================");
+
+        int nbCol=result.length;
+        int nbLignes=result[0].length;
+        
+        
+        for (int i = 0; i < nbLignes; i++) {
+            
+            System.out.println(result[0][i]+"  /  "+result[1][i]);
+        }
+        
 
         try {
             BinaryFileWriter binRes = new BinaryFileWriter(basename + ".bin");
@@ -80,7 +108,7 @@ public class Problem {
             TextFileWriter textRes = new TextFileWriter(basename + ".res");
             binRes.setTextResFile(textRes);
 
-            binRes.writeProblemResults(result, this.mesh.getRcmOptim(), mesh);
+            binRes.writeProblemResults(result, this.mesh.getRcmOptimInverse(), mesh);
 
             binRes.close();
             textLog.close();
